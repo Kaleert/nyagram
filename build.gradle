@@ -92,3 +92,11 @@ publishing {
         }
     }
 }
+
+javadoc {
+    options {
+        encoding = 'UTF-8'
+        tags = [ 'example:a:Example:' ] 
+        addStringOption('Xdoclint:none', '-quiet') 
+    }
+}
