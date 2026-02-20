@@ -3,7 +3,7 @@
 ![Java 21](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2+-green?style=flat-square&logo=springboot)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
-![Version](https://img.shields.io/badge/version-1.1.1-red?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.1.2-red?style=flat-square)
 
 [🇷🇺 Читать на русском](Readme_RU.md)
 
@@ -37,7 +37,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.kaleert:nyagram:1.1.1'
+    implementation 'io.github.kaleert:nyagram:1.1.2'
 }
 ```
 
@@ -46,7 +46,7 @@ dependencies {
 <dependency>
     <groupId>io.github.kaleert</groupId>
     <artifactId>nyagram</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
 </dependency>
 ```
 

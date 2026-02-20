@@ -270,20 +270,23 @@ public class CommandRegistry implements BeanPostProcessor {
 
         String searchKey = text.trim().toLowerCase();
 
-        // 1. Оптимизация: Прямое совпадение
+        // 1. Прямое совпадение (например, "/start")
         CommandMeta directMatch = commandMap.get(searchKey);
         if (directMatch != null) {
             return directMatch;
         }
 
-        // 2. Поиск по префиксу с учетом пробела
-        // sortedCommandKeys отсортирован от длинных к коротким.
-        // Это гарантирует, что "/test parser" найдется раньше, чем "/test".
+        // 2. Поиск по префиксу (например, "/find текст")
         for (String key : sortedCommandKeys) {
-            // Проверяем startsWith(key + " "), чтобы "/testing" не сработало на "/test"
+            if (key.isEmpty()) continue;
             if (searchKey.startsWith(key + " ")) {
                 return commandMap.get(key);
             }
+        }
+        
+        // 3. Если ничего не нашли, проверяем, есть ли "дефолтный" обработчик (для простого текста)
+        if (commandMap.containsKey("")) {
+            return commandMap.get("");
         }
 
         return null;

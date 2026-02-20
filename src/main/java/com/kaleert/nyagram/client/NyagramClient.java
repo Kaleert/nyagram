@@ -202,7 +202,11 @@ public class NyagramClient {
         });
     
         files.forEach((fieldName, file) -> {
-            body.add(fieldName, new StreamingMultipartFile(file));
+            if (file.isNew()) {
+                body.add(fieldName, new StreamingMultipartFile(file));
+            } else {
+                body.add(fieldName, file.getAttachName());
+            }
         });
     
         return body;

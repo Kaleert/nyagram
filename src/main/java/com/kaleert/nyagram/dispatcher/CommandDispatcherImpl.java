@@ -281,13 +281,13 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
         for (int i = 0; i < parameters.size(); i++) {
             Parameter param = parameters.get(i);
-            
-            ArgumentResolver<?> resolver = findResolver(param.getType());
 
             if (param.isVarArgs()) {
                 invokeArgs[i] = resolveVarArgs(param, tokens, context);
                 break;
             }
+
+            ArgumentResolver<?> resolver = findResolver(param.getType());
 
             if (!resolver.isTokenRequired()) {
                 invokeArgs[i] = resolver.resolve(context, param, null);
@@ -300,7 +300,8 @@ public class CommandDispatcherImpl implements CommandDispatcher {
                 } else if (tokens.isEmpty()) {
                     throw new ArgumentParseException("Missing required text argument: " + getParameterName(param));
                 } else {
-                    invokeArgs[i] = String.join(" ", tokens);
+                    List<String> remaining = new ArrayList<>(tokens);
+                    invokeArgs[i] = String.join(" ", remaining);
                     tokens.clear();
                 }
                 continue;

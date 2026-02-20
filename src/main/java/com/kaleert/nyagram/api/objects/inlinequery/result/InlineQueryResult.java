@@ -21,11 +21,12 @@ import com.kaleert.nyagram.api.objects.replykeyboard.InlineKeyboardMarkup;
     @JsonSubTypes.Type(value = InlineQueryResultArticle.class, name = "article"),
     @JsonSubTypes.Type(value = InlineQueryResultPhoto.class, name = "photo"),
     @JsonSubTypes.Type(value = InlineQueryResultVideo.class, name = "video"),
-    @JsonSubTypes.Type(value = InlineQueryResultGif.class, name = "gif")
+    @JsonSubTypes.Type(value = InlineQueryResultGif.class, name = "gif"),
+    @JsonSubTypes.Type(value = InlineQueryResultAudio.class, name = "audio")
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public sealed interface InlineQueryResult extends BotApiObject 
-    permits InlineQueryResultArticle, InlineQueryResultPhoto, InlineQueryResultVideo, InlineQueryResultGif {
+    permits InlineQueryResultArticle, InlineQueryResultPhoto, InlineQueryResultVideo, InlineQueryResultGif, InlineQueryResultAudio {
     
     /**
      * Тип результата (article, photo, video, gif и т.д.).

@@ -1,7 +1,7 @@
 package com.kaleert.nyagram.core;
 
 import com.kaleert.nyagram.api.objects.Update;
-import com.kaleert.nyagram.callback.CallbackDispatcher; // <-- ИМПОРТ
+import com.kaleert.nyagram.callback.CallbackDispatcher;
 import com.kaleert.nyagram.client.NyagramClient;
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.concurrency.BotConcurrencyStrategy;
@@ -9,6 +9,8 @@ import com.kaleert.nyagram.core.spi.RawUpdateHandler;
 import com.kaleert.nyagram.core.spi.UpdateInterceptor;
 import com.kaleert.nyagram.dispatcher.CommandDispatcher;
 import com.kaleert.nyagram.dispatcher.EventDispatcher;
+import com.kaleert.nyagram.fsm.SessionManager;
+import com.kaleert.nyagram.fsm.UserSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,7 @@ public class UpdateProcessor {
     private final CallbackDispatcher callbackDispatcher;
     private final BotConcurrencyStrategy concurrencyStrategy;
     private final NyagramClient nyagramClient;
+    private final SessionManager sessionManager;
     
     private final Optional<RawUpdateHandler> rawUpdateHandler;
     private final List<UpdateInterceptor> interceptors;
@@ -78,18 +81,32 @@ public class UpdateProcessor {
                 processingFuture = CompletableFuture.completedFuture(true);
             } 
             
-            else if (isMessage(update)) {
-                processingFuture = commandDispatcher.dispatch(update)
-                        .thenApply(result -> true)
-                        .exceptionally(ex -> {
-                            log.error("Error in command dispatch", ex);
-                            return false;
-                        });
+            else if (update.hasMessage()) {
+                boolean hasActiveSession = false;
+                Long userId = update.getFromId();
+                if (userId != null) {
+                    UserSession session = sessionManager.getSession(userId);
+                    if (session != null && session.getState() != null) {
+                        hasActiveSession = true;
+                    }
+                }
+
+                if (update.isCommand() || hasActiveSession) {
+                    processingFuture = commandDispatcher.dispatch(update)
+                            .thenApply(result -> true)
+                            .exceptionally(ex -> {
+                                log.error("Error in command dispatch", ex);
+                                return false;
+                            });
+                } else {
+                    eventDispatcher.dispatch(update);
+                    processingFuture = CompletableFuture.completedFuture(true);
+                }
             } 
             
             else if (update.hasCallbackQuery()) {
                 CommandContext context = new CommandContext(update, nyagramClient);
-                callbackDispatcher.dispatch(context); // <-- Вызываем диспетчер
+                callbackDispatcher.dispatch(context);
                 processingFuture = CompletableFuture.completedFuture(true);
             }
             
