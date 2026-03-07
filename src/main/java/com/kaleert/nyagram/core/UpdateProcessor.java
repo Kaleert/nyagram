@@ -39,7 +39,6 @@ public class UpdateProcessor {
     private final CallbackDispatcher callbackDispatcher;
     private final BotConcurrencyStrategy concurrencyStrategy;
     private final NyagramClient nyagramClient;
-    private final SessionManager sessionManager;
     
     private final Optional<RawUpdateHandler> rawUpdateHandler;
     private final List<UpdateInterceptor> interceptors;
