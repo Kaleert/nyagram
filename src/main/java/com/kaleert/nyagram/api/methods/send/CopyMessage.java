@@ -1,4 +1,4 @@
-package com.kaleert.nyagram.api.methods.sending;
+package com.kaleert.nyagram.api.methods.send;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

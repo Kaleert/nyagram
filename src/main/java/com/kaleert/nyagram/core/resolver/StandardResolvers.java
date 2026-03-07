@@ -5,7 +5,7 @@ import com.kaleert.nyagram.api.objects.User;
 import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.client.NyagramClient;
 import com.kaleert.nyagram.command.CommandContext;
-import com.kaleert.nyagram.exception.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Parameter;

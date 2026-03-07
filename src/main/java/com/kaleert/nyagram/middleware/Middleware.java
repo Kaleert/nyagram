@@ -3,8 +3,6 @@ package com.kaleert.nyagram.middleware;
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.meta.CommandMeta;
 import org.springframework.core.Ordered;
-
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**

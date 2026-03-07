@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaleert.nyagram.api.meta.BotApiObject;
 import com.kaleert.nyagram.api.objects.User;
-import com.kaleert.nyagram.api.objects.webapp.WebAppInfo;
 import java.util.List;
 
 /**

@@ -8,7 +8,6 @@ import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.api.objects.message.MaybeInaccessibleMessage;
 import com.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
 import com.kaleert.nyagram.client.NyagramClient;
-import com.kaleert.nyagram.api.objects.forum.ForumIconColor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaleert.nyagram.api.meta.BotApiObject;
 import com.kaleert.nyagram.api.objects.User;
-import java.util.List;
 
 /**
  * Описывает транзакцию Telegram Stars.

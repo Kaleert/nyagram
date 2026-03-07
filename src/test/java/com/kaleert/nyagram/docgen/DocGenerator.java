@@ -30,7 +30,7 @@ public class DocGenerator {
 
     private static final String SOURCE_ROOT = "src/main/java";
     private static final String OUTPUT_FILE = "../nyagram-docs/public/data/api.yaml";
-    private static final String PROJECT_VERSION = "1.1.1";
+    private static final String PROJECT_VERSION = "1.1.3";
     
     private static final JavaParser parser;
     private static final ObjectMapper mapper;

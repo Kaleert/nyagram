@@ -2,7 +2,6 @@ package com.kaleert.nyagram.util.keyboard;
 
 import com.kaleert.nyagram.api.objects.replykeyboard.InlineKeyboardMarkup;
 import com.kaleert.nyagram.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import com.kaleert.nyagram.api.objects.replykeyboard.buttons.InlineKeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,7 +2,6 @@ package com.kaleert.nyagram.feature.forum;
 
 import com.kaleert.nyagram.api.objects.forum.ForumTopic;
 import com.kaleert.nyagram.api.objects.forum.ForumIconColor;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**

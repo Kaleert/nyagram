@@ -10,8 +10,8 @@ import com.kaleert.nyagram.core.resolver.TypedArgumentResolver;
 import com.kaleert.nyagram.core.AsyncMode;
 import com.kaleert.nyagram.core.spi.MissingArgumentHandler;
 import com.kaleert.nyagram.event.BotExecutionErrorEvent;
-import com.kaleert.nyagram.exception.ArgumentParseException;
-import com.kaleert.nyagram.exception.CommandExecutionException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.CommandExecutionException;
 import com.kaleert.nyagram.meta.CommandMeta;
 import com.kaleert.nyagram.middleware.MdcMiddleware;
 import com.kaleert.nyagram.middleware.MiddlewareDispatcher;
@@ -98,6 +98,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         }
     }
 
+    @SuppressWarnings("unused")
     private CommandResult fallbackHandler() {
         return CommandResult.noResponse();
     }
@@ -155,6 +156,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         return update.hasMessage();
     }
 
+    @SuppressWarnings("unused")
     private CommandResult processCommandSync(Update update) {
         Message message = update.getMessage();
         String text = message.hasText() ? message.getText() : null;
@@ -365,6 +367,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         return array;
     }
     
+    @SuppressWarnings("unused")
     private Object convertToken(String token, Parameter param, CommandContext ctx) {
         Class<?> type = param.getType();
 
@@ -390,6 +393,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         }
     }
     
+    @SuppressWarnings("unused")
     private boolean isTypeSupported(ArgumentResolver<?> resolver, Class<?> type) {
         String resolverName = resolver.getClass().getSimpleName();
         if (resolverName.startsWith("Integer") && (type == Integer.class || type == int.class)) return true;
@@ -424,6 +428,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         return (argAnn != null && !argAnn.value().isEmpty()) ? argAnn.value() : param.getName();
     }
 
+    @SuppressWarnings("unused")
     private String reconstructTail(List<String> tokens, int startIndex) {
         StringBuilder tail = new StringBuilder();
         for (int j = startIndex; j < tokens.size(); j++) {
@@ -467,7 +472,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         }
     
         boolean isBusinessException = e instanceof ArgumentParseException 
-                                   || e instanceof com.kaleert.nyagram.exception.NoPermissionException
+                       || e instanceof com.kaleert.nyagram.exceptions.NoPermissionException
                                    || e instanceof IllegalArgumentException;
     
         String userMessage;

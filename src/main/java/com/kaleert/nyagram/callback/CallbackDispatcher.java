@@ -6,7 +6,7 @@ import com.kaleert.nyagram.callback.annotation.CallbackVar;
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.ArgumentResolver;
 import com.kaleert.nyagram.core.CommandResult;
-import com.kaleert.nyagram.exception.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

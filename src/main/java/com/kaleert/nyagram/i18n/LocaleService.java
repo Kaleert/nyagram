@@ -7,6 +7,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
+import org.yaml.snakeyaml.LoaderOptions;
 
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -69,11 +71,29 @@ public class LocaleService {
                 }
                 
                 Locale locale = Locale.forLanguageTag(localeCode.replace('_', '-'));
-                Map<String, Object> rawData = new Yaml().load(resource.getInputStream());
+                LoaderOptions loaderOptions = new LoaderOptions();
+                SafeConstructor safeConstructor = new SafeConstructor(loaderOptions);
+                Yaml yaml = new Yaml(safeConstructor);
+                Object loaded = yaml.load(resource.getInputStream());
 
-                Map<String, String> flatTranslations = flattenMap(rawData);
+                if (!(loaded instanceof Map)) {
+                    log.warn("Skipping {} — parsed content is not a mapping", filename);
+                    continue;
+                }
+
+                Map<?, ?> rawData = (Map<?, ?>) loaded;
+
+                Map<String, String> flatTranslations;
+                try {
+                    log.info("Parsing localization file: {}", filename);
+                    flatTranslations = flattenMap(rawData);
+                } catch (RuntimeException ex) {
+                    log.error("Failed to flatten translations for file {}", filename, ex);
+                    throw ex;
+                }
+
                 translations.put(locale, flatTranslations);
-                
+
                 log.info("Successfully loaded {} translations for locale {} from {}", 
                         flatTranslations.size(), locale, filename);
             }
@@ -82,19 +102,20 @@ public class LocaleService {
         }
     }
     
-    private Map<String, String> flattenMap(Map<String, Object> source) {
+    private Map<String, String> flattenMap(Map<?, ?> source) {
         Map<String, String> result = new ConcurrentHashMap<>();
         flatten(source, "", result);
         return result;
     }
 
-    private void flatten(Map<String, Object> source, String prefix, Map<String, String> result) {
-        source.forEach((key, value) -> {
-            String newKey = prefix.isEmpty() ? key : prefix + "." + key;
-            if (value instanceof Map) {
-                flatten((Map<String, Object>) value, newKey, result);
-            } else if (value != null) {
-                result.put(newKey, value.toString());
+    private void flatten(Map<?, ?> source, String prefix, Map<String, String> result) {
+        source.forEach((k, v) -> {
+            String keyStr = String.valueOf(k);
+            String newKey = prefix.isEmpty() ? keyStr : prefix + "." + keyStr;
+            if (v instanceof Map) {
+                flatten((Map<?, ?>) v, newKey, result);
+            } else if (v != null) {
+                result.put(newKey, v.toString());
             }
         });
     }
@@ -136,7 +157,7 @@ public class LocaleService {
             return translation;
         }
 
-        Locale languageLocale = new Locale(locale.getLanguage());
+        Locale languageLocale = Locale.forLanguageTag(locale.getLanguage());
         if (!locale.equals(languageLocale)) {
             translation = Optional.ofNullable(translations.get(languageLocale))
                     .map(map -> map.get(key))

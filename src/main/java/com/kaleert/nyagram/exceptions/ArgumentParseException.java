@@ -1,4 +1,4 @@
-package com.kaleert.nyagram.exception;
+package com.kaleert.nyagram.exceptions;
 
 /**
  * Исключение, выбрасываемое при ошибке преобразования аргумента команды.

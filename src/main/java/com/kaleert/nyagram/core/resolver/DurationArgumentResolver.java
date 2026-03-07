@@ -1,8 +1,7 @@
 package com.kaleert.nyagram.core.resolver;
 
-import com.kaleert.nyagram.core.ArgumentResolver;
 import com.kaleert.nyagram.command.CommandContext;
-import com.kaleert.nyagram.exception.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Parameter;

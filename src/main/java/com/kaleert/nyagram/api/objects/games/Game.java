@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaleert.nyagram.api.meta.BotApiObject;
 import com.kaleert.nyagram.api.objects.PhotoSize;
 import com.kaleert.nyagram.api.objects.message.MessageEntity;
-import com.kaleert.nyagram.api.objects.Animation;
-
 import java.util.List;
 
 /**

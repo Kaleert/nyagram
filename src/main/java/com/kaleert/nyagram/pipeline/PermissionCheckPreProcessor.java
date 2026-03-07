@@ -2,7 +2,7 @@ package com.kaleert.nyagram.pipeline;
 
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.CommandResult;
-import com.kaleert.nyagram.exception.NoPermissionException;
+import com.kaleert.nyagram.exceptions.NoPermissionException;
 import com.kaleert.nyagram.meta.CommandMeta;
 import com.kaleert.nyagram.security.spi.UserPermissionProvider;
 import lombok.RequiredArgsConstructor;

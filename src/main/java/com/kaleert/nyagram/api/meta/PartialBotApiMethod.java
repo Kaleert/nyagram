@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 
 /**

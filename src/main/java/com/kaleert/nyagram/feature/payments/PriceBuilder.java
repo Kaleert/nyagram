@@ -1,4 +1,4 @@
-package com.kaleert.nyagram.feature.payment;
+package com.kaleert.nyagram.feature.payments;
 
 import com.kaleert.nyagram.api.objects.payments.LabeledPrice;
 

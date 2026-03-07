@@ -1,4 +1,4 @@
-package com.kaleert.nyagram.api.objects.inlinequery;
+package com.kaleert.nyagram.api.objects.inlinequery.inlinequery;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

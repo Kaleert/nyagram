@@ -1,6 +1,6 @@
 package com.kaleert.nyagram.core;
 
-import com.kaleert.nyagram.exception.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import com.kaleert.nyagram.command.CommandContext;
 import java.lang.reflect.Parameter;
 

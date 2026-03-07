@@ -1,9 +1,5 @@
 package com.kaleert.nyagram.middleware;
 
-import com.kaleert.nyagram.client.NyagramClient;
-import com.kaleert.nyagram.api.objects.Update;
-import com.kaleert.nyagram.api.objects.User;
-import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.CommandResult;
 import com.kaleert.nyagram.meta.CommandMeta;
@@ -18,7 +14,6 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 /**

@@ -1,4 +1,4 @@
-package com.kaleert.nyagram.exception;
+package com.kaleert.nyagram.exceptions;
 
 /**
  * Общее исключение, возникающее при фатальных ошибках выполнения команды.

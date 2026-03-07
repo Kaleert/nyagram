@@ -3,8 +3,6 @@ package com.kaleert.nyagram.config;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 /**

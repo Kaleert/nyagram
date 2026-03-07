@@ -2,7 +2,6 @@ package com.kaleert.nyagram.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaleert.nyagram.api.dto.TelegramResponse;
 import com.kaleert.nyagram.api.exception.TelegramApiException;
@@ -29,8 +28,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -51,6 +48,7 @@ public class NyagramClient {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    @SuppressWarnings("unused")
     private final AdvancedMultipartBuilder multipartBuilder;
     private final Executor taskExecutor;
     private final TokenBucketRateLimiter rateLimiter;

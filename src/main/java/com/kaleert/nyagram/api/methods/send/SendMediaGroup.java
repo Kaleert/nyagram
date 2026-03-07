@@ -14,7 +14,6 @@ import com.kaleert.nyagram.api.objects.media.InputMediaVideo;
 import com.kaleert.nyagram.api.objects.message.Message;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**

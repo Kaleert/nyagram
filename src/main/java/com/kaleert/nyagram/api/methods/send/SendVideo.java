@@ -7,7 +7,7 @@ import com.kaleert.nyagram.api.exception.TelegramApiRequestException;
 import com.kaleert.nyagram.api.exception.TelegramApiValidationException;
 import com.kaleert.nyagram.api.meta.BotApiMethod;
 import com.kaleert.nyagram.api.meta.MultipartRequest;
-import com.kaleert.nyagram.api.methods.ParseMode;
+ 
 import com.kaleert.nyagram.api.objects.InputFile;
 import com.kaleert.nyagram.api.objects.message.MessageEntity;
 import com.kaleert.nyagram.api.objects.message.Message;
@@ -15,7 +15,6 @@ import com.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
 import lombok.*;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.*;
 /**
  * Используйте этот метод для отправки видеофайлов.

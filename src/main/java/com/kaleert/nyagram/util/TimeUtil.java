@@ -3,7 +3,6 @@ package com.kaleert.nyagram.util;
 import com.kaleert.nyagram.i18n.LocaleService;
 import java.time.Duration;
 import java.util.Locale;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Утилита для форматирования временных интервалов.
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
  *
  * @since 1.0.0
  */
-@RequiredArgsConstructor
 public class TimeUtil {
 
     private static final long SECONDS_IN_MINUTE = 60L;
@@ -25,7 +23,7 @@ public class TimeUtil {
     private static final long SECONDS_IN_MONTH = 30L * SECONDS_IN_DAY;
     private static final long SECONDS_IN_YEAR = 365L * SECONDS_IN_DAY;
     
-    private final LocaleService localeService;
+    
     
     /**
      * Форматирует длительность в локализованную строку.

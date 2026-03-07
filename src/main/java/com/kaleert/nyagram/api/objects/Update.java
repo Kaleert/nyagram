@@ -6,14 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import com.kaleert.nyagram.api.objects.boost.*;
 import com.kaleert.nyagram.api.objects.chat.Chat;
 import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.api.objects.chatmember.ChatMember;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Основной объект, представляющий входящее событие (обновление) от Telegram.

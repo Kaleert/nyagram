@@ -3,7 +3,7 @@ package com.kaleert.nyagram.core.impl;
 import com.kaleert.nyagram.api.methods.send.SendMessage;
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.spi.MissingArgumentHandler;
-import com.kaleert.nyagram.exception.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import com.kaleert.nyagram.meta.CommandMeta;
 import lombok.extern.slf4j.Slf4j;
 

@@ -2,7 +2,6 @@ package com.kaleert.nyagram.api.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaleert.nyagram.api.meta.BotApiObject;
-import com.kaleert.nyagram.api.objects.PhotoSize;
 import java.util.List;
 
 /**

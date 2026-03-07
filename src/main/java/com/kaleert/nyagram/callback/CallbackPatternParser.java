@@ -1,6 +1,5 @@
 package com.kaleert.nyagram.callback;
 
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.*;

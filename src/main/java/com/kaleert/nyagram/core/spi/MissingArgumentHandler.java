@@ -1,7 +1,7 @@
 package com.kaleert.nyagram.core.spi;
 
 import com.kaleert.nyagram.command.CommandContext;
-import com.kaleert.nyagram.exception.ArgumentParseException;
+import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import com.kaleert.nyagram.meta.CommandMeta;
 
 /**

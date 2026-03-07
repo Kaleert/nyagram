@@ -10,7 +10,6 @@ import com.kaleert.nyagram.core.spi.UpdateInterceptor;
 import com.kaleert.nyagram.dispatcher.CommandDispatcher;
 import com.kaleert.nyagram.dispatcher.EventDispatcher;
 import com.kaleert.nyagram.fsm.SessionManager;
-import com.kaleert.nyagram.fsm.UserSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -81,27 +80,13 @@ public class UpdateProcessor {
                 processingFuture = CompletableFuture.completedFuture(true);
             } 
             
-            else if (update.hasMessage()) {
-                boolean hasActiveSession = false;
-                Long userId = update.getFromId();
-                if (userId != null) {
-                    UserSession session = sessionManager.getSession(userId);
-                    if (session != null && session.getState() != null) {
-                        hasActiveSession = true;
-                    }
-                }
-
-                if (update.isCommand() || hasActiveSession) {
-                    processingFuture = commandDispatcher.dispatch(update)
-                            .thenApply(result -> true)
-                            .exceptionally(ex -> {
-                                log.error("Error in command dispatch", ex);
-                                return false;
-                            });
-                } else {
-                    eventDispatcher.dispatch(update);
-                    processingFuture = CompletableFuture.completedFuture(true);
-                }
+            else if (isMessage(update)) {
+                processingFuture = commandDispatcher.dispatch(update)
+                        .thenApply(result -> true)
+                        .exceptionally(ex -> {
+                            log.error("Error in command dispatch", ex);
+                            return false;
+                        });
             } 
             
             else if (update.hasCallbackQuery()) {
@@ -131,6 +116,7 @@ public class UpdateProcessor {
         });
     }
 
+    @SuppressWarnings("unused")
     private boolean isMessage(Update update) {
         return update.hasMessage();
     }

@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
+
 
 /**
  * Абстрактный базовый класс для всех методов Telegram Bot API.
