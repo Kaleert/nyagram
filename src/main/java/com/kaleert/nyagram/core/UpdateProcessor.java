@@ -9,7 +9,6 @@ import com.kaleert.nyagram.core.spi.RawUpdateHandler;
 import com.kaleert.nyagram.core.spi.UpdateInterceptor;
 import com.kaleert.nyagram.dispatcher.CommandDispatcher;
 import com.kaleert.nyagram.dispatcher.EventDispatcher;
-import com.kaleert.nyagram.fsm.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,7 +79,7 @@ public class UpdateProcessor {
                 processingFuture = CompletableFuture.completedFuture(true);
             } 
             
-            else if (isMessage(update)) {
+            else if (update.hasMessage() && update.isCommand()) {
                 processingFuture = commandDispatcher.dispatch(update)
                         .thenApply(result -> true)
                         .exceptionally(ex -> {
@@ -116,7 +115,6 @@ public class UpdateProcessor {
         });
     }
 
-    @SuppressWarnings("unused")
     private boolean isMessage(Update update) {
         return update.hasMessage();
     }
