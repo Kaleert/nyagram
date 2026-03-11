@@ -15,3 +15,4 @@ bin/
 .DS_Store
 build.log
 !gradle/wrapper/gradle-wrapper.jar
+.gradle-local

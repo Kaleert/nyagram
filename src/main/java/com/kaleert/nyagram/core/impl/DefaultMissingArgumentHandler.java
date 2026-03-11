@@ -5,6 +5,7 @@ import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.spi.MissingArgumentHandler;
 import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import com.kaleert.nyagram.meta.CommandMeta;
+import com.kaleert.nyagram.util.TextUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,9 +21,9 @@ public class DefaultMissingArgumentHandler implements MissingArgumentHandler {
 
     @Override
     public void handle(CommandContext context, CommandMeta meta, ArgumentParseException e) {
-        String syntax = meta.getUsageSyntax(); 
-        String reply = String.format("⚠️ <b>Ошибка ввода:</b> %s\n\n📝 Пример использования:\n<code>%s</code>", 
-                                     e.getMessage(), syntax);
+        String syntax = meta.getUsageSyntax();
+        String reply = String.format("⚠️ <b>Ошибка ввода:</b> %s\n\n📝 Пример использования:\n%s",
+                TextUtil.escapeHtml(e.getMessage()), TextUtil.code(syntax));
         
         try {
             SendMessage msg = SendMessage.builder()

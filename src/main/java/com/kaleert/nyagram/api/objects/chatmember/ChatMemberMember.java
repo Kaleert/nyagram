@@ -15,6 +15,7 @@ import com.kaleert.nyagram.api.objects.User;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ChatMemberMember(
     @JsonProperty("user") User user,
+    @JsonProperty("tag") String tag,
     @JsonProperty("until_date") Integer untilDate
 ) implements ChatMember {
     

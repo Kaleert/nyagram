@@ -7,6 +7,7 @@ import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.core.ArgumentResolver;
 import com.kaleert.nyagram.core.CommandResult;
 import com.kaleert.nyagram.exceptions.ArgumentParseException;
+import com.kaleert.nyagram.i18n.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Диспетчер callback-запросов (нажатий на кнопки Inline-клавиатуры).
@@ -35,6 +37,8 @@ public class CallbackDispatcher {
     private final CallbackRegistry registry;
     private final CallbackPatternParser parser;
     private final List<ArgumentResolver<?>> resolvers;
+    private final Optional<LocaleService> localeService;
+    private final Optional<LocaleResolver> localeResolver;
     
     /**
      * Маршрутизирует входящий callback-запрос к соответствующему методу-обработчику.

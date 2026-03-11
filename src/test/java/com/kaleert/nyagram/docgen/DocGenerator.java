@@ -17,7 +17,6 @@ import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
 import com.github.javaparser.ast.nodeTypes.NodeWithTypeParameters;
 import com.github.javaparser.javadoc.JavadocBlockTag;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -30,8 +29,7 @@ public class DocGenerator {
 
     private static final String SOURCE_ROOT = "src/main/java";
     private static final String OUTPUT_FILE = "../nyagram-docs/public/data/api.yaml";
-    private static final String PROJECT_VERSION = "1.1.3";
-    
+    private static String projectVersion = "Unknown";
     private static final JavaParser parser;
     private static final ObjectMapper mapper;
     
@@ -47,6 +45,19 @@ public class DocGenerator {
         parser = new JavaParser(config);
 
         mapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER));
+
+        try {
+            File pkgFile = new File("package.json");
+            if (pkgFile.exists()) {
+                // Создаем чистый маппер специально для JSON
+                com.fasterxml.jackson.databind.JsonNode node = new ObjectMapper().readTree(pkgFile);
+                projectVersion = node.get("version").asText();
+                node.get("telegramApiVersion").asText();
+            }
+        } catch (Exception e) {
+            System.err.println("Could not read package.json: " + e.getMessage());
+        }
+
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -78,7 +89,7 @@ public class DocGenerator {
         }
         packages.sort(Comparator.comparing(p -> p.name));
 
-        ApiRoot root = new ApiRoot(PROJECT_VERSION, packages);
+        ApiRoot root = new ApiRoot(projectVersion, packages);
         File outFile = new File(OUTPUT_FILE);
         if (outFile.getParentFile() != null) outFile.getParentFile().mkdirs();
         mapper.writeValue(outFile, root);
@@ -170,7 +181,7 @@ public class DocGenerator {
                 DeprecationDoc deprecation = extractDeprecation(type, type);
                 
                 String rawSince = extractTag(type, JavadocBlockTag.Type.SINCE);
-                final String effectiveClassSince = (rawSince != null && !rawSince.isEmpty()) ? rawSince : PROJECT_VERSION;
+                final String effectiveClassSince = (rawSince != null && !rawSince.isEmpty()) ? rawSince : projectVersion;
                 String classExample = cleanExampleCode(extractTag(type, "example"));
 
                 List<String> extendsList = type.isClassOrInterfaceDeclaration() ? 

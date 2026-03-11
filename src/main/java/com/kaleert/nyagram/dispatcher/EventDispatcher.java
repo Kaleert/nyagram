@@ -7,12 +7,14 @@ import com.kaleert.nyagram.core.registry.EventRegistry;
 import com.kaleert.nyagram.client.NyagramClient;
 import com.kaleert.nyagram.event.EventType;
 import com.kaleert.nyagram.meta.EventMeta;
+import com.kaleert.nyagram.i18n.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Parameter;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Диспетчер событий (не команд).
@@ -32,6 +34,8 @@ public class EventDispatcher {
     private final EventRegistry eventRegistry;
     private final List<ArgumentResolver<?>> argumentResolvers;
     private final NyagramClient nyagramClient;
+    private final Optional<LocaleService> localeService;
+    private final Optional<LocaleResolver> localeResolver;
     
     /**
      * Обрабатывает входящее обновление как событие.
@@ -49,7 +53,12 @@ public class EventDispatcher {
         List<EventMeta> handlers = eventRegistry.getHandlers(type);
         if (handlers.isEmpty()) return;
 
-        CommandContext context = new CommandContext(update, nyagramClient);
+        CommandContext context = new CommandContext(
+            update, 
+            nyagramClient, 
+            localeService.orElse(null), 
+            localeResolver.orElse(null)
+        );
 
         for (EventMeta meta : handlers) {
             try {

@@ -19,6 +19,7 @@ import com.kaleert.nyagram.middleware.MiddlewareResult;
 import com.kaleert.nyagram.pipeline.CommandPostProcessor;
 import com.kaleert.nyagram.pipeline.CommandPreProcessor;
 import com.kaleert.nyagram.util.CommandTokenizer;
+import com.kaleert.nyagram.i18n.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -68,6 +69,9 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     private final ApplicationEventPublisher eventPublisher;
     private CommandMeta fallbackMeta;
     private final MissingArgumentHandler missingArgumentHandler;
+    private final EventDispatcher eventDispatcher;
+    private final Optional<LocaleService> localeService;
+    private final Optional<LocaleResolver> localeResolver;
     
     /**
      * Инициализирует диспетчер, регистрируя базовые резолверы аргументов.
@@ -83,13 +87,13 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     
     private void initFallbackMeta() {
         try {
-            Method method = this.getClass().getDeclaredMethod("fallbackHandler");
+            Method method = this.getClass().getDeclaredMethod("fallbackHandler", CommandContext.class);
             fallbackMeta = CommandMeta.builder()
                     .fullCommandPath("fallback")
                     .handlerInstance(this)
                     .method(method)
                     .methodHandle(MethodHandles.lookup().unreflect(method).bindTo(this))
-                    .methodParameters(Collections.emptyList())
+                    .methodParameters(Arrays.asList(method.getParameters()))
                     .asyncMode(AsyncMode.Mode.SEQUENTIAL)
                     .requiredPermissions(Collections.emptySet())
                     .build();
@@ -99,7 +103,8 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     }
 
     @SuppressWarnings("unused")
-    private CommandResult fallbackHandler() {
+    private CommandResult fallbackHandler(CommandContext context) {
+        eventDispatcher.dispatch(context.getUpdate());
         return CommandResult.noResponse();
     }
     
@@ -169,7 +174,12 @@ public class CommandDispatcherImpl implements CommandDispatcher {
         
         final CommandMeta finalMeta = meta; 
 
-        CommandContext context = new CommandContext(update, nyagramClient);
+        CommandContext context = new CommandContext(
+            update, 
+            nyagramClient, 
+            localeService.orElse(null), 
+            localeResolver.orElse(null)
+        );
 
         if (meta.getAsyncMode() == com.kaleert.nyagram.core.AsyncMode.Mode.CONCURRENT) {
             CompletableFuture.runAsync(() -> executeCommandLogic(context, finalMeta, startTime));
@@ -190,7 +200,12 @@ public class CommandDispatcherImpl implements CommandDispatcher {
             meta = fallbackMeta;
         }
 
-        CommandContext context = new CommandContext(update, nyagramClient);
+        CommandContext context = new CommandContext(
+            update, 
+            nyagramClient, 
+            localeService.orElse(null), 
+            localeResolver.orElse(null)
+        );
         
         final CommandMeta finalMeta = meta; 
 
@@ -205,10 +220,6 @@ public class CommandDispatcherImpl implements CommandDispatcher {
                     
                     if (middlewareResult.getType() == MiddlewareResult.Type.ERROR) {
                         return CompletableFuture.completedFuture(CommandResult.error(middlewareResult.getMessage()));
-                    }
-
-                    if (finalMeta == fallbackMeta) {
-                        return CompletableFuture.completedFuture(CommandResult.noResponse());
                     }
 
                     if (finalMeta.getAsyncMode() == AsyncMode.Mode.CONCURRENT) {
@@ -239,13 +250,17 @@ public class CommandDispatcherImpl implements CommandDispatcher {
                 }
             }
 
-            Object[] args = resolveArguments(meta, context.getText(), context);
-            
             Object invocationResult;
-            if (meta.getMethodHandle() != null) {
-                invocationResult = meta.getMethodHandle().invokeWithArguments(args);
+            if (meta == fallbackMeta) {
+                // Прямой вызов для обычных сообщений, минуя парсинг аргументов
+                invocationResult = fallbackHandler(context);
             } else {
-                invocationResult = meta.getMethod().invoke(meta.getHandlerInstance(), args);
+                Object[] args = resolveArguments(meta, context.getText(), context);
+                if (meta.getMethodHandle() != null) {
+                    invocationResult = meta.getMethodHandle().invokeWithArguments(args);
+                } else {
+                    invocationResult = meta.getMethod().invoke(meta.getHandlerInstance(), args);
+                }
             }
 
             result = processInvocationResult(invocationResult);
@@ -253,8 +268,10 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
         } catch (InvocationTargetException e) {
             result = handleException(context, meta, e.getTargetException());
+            sendResult(context, result);
         } catch (Throwable e) {
             result = handleException(context, meta, e);
+            sendResult(context, result);
         } finally {
             long duration = System.currentTimeMillis() - startTime;
             final CommandResult finalResult = (result != null) ? result : CommandResult.error("Unknown state");
@@ -455,8 +472,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     private void sendResult(CommandContext context, CommandResult result) {
         if (result != null && 
             result.getMessage() != null && 
-            !result.getMessage().isEmpty() &&
-            result.isSuccess()) {
+            !result.getMessage().isEmpty()) {
             
             context.reply(result.getMessage());
         }
@@ -468,7 +484,7 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     
         if (e instanceof ArgumentParseException) {
             missingArgumentHandler.handle(context, meta, (ArgumentParseException) e);
-            return CommandResult.error(e.getMessage());
+            return CommandResult.noResponse();
         }
     
         boolean isBusinessException = e instanceof ArgumentParseException 

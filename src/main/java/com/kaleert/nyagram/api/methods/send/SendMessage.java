@@ -97,6 +97,14 @@ public class SendMessage extends BotApiMethod<Message> {
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор эффекта сообщения (например, ID анимации огня или сердечек). */
+    @JsonProperty("message_effect_id")
+    private String messageEffectId;
+
+    /** Идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id")
+    private String businessConnectionId;
+
     @Override
     public String getMethod() {
         return PATH;

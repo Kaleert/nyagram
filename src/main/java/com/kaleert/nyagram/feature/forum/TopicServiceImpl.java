@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * Стандартная реализация {@link TopicService}.
@@ -75,7 +76,8 @@ public class TopicServiceImpl implements TopicService {
         return client.executeAsync(CloseForumTopic.builder()
                 .chatId(chatId.toString())
                 .messageThreadId(messageThreadId)
-                .build());
+                .build())
+                .exceptionally(ex -> ignoreTopicStateError("close", chatId, messageThreadId, ex));
     }
 
     @Override
@@ -83,7 +85,8 @@ public class TopicServiceImpl implements TopicService {
         return client.executeAsync(ReopenForumTopic.builder()
                 .chatId(chatId.toString())
                 .messageThreadId(messageThreadId)
-                .build());
+                .build())
+                .exceptionally(ex -> ignoreTopicStateError("reopen", chatId, messageThreadId, ex));
     }
 
     @Override
@@ -106,5 +109,18 @@ public class TopicServiceImpl implements TopicService {
                 .chatId(chatId.toString())
                 .messageThreadId(messageThreadId)
                 .build());
+    }
+
+    private Boolean ignoreTopicStateError(String action, Long chatId, Integer messageThreadId, Throwable ex) {
+        Throwable root = ex instanceof CompletionException && ex.getCause() != null ? ex.getCause() : ex;
+        String message = root.getMessage();
+        if (message != null && message.contains("TOPIC_NOT_MODIFIED")) {
+            log.info("Игнорирую {} topic {} в чате {}: TOPIC_NOT_MODIFIED", action, messageThreadId, chatId);
+            return true;
+        }
+        if (root instanceof RuntimeException runtimeException) {
+            throw runtimeException;
+        }
+        throw new CompletionException(root);
     }
 }

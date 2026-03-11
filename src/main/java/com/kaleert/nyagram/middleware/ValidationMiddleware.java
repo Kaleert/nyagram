@@ -1,9 +1,11 @@
 package com.kaleert.nyagram.middleware;
 
 import com.kaleert.nyagram.command.CommandContext;
+import com.kaleert.nyagram.command.Flag;
 import com.kaleert.nyagram.core.CommandResult;
 import com.kaleert.nyagram.meta.CommandMeta;
 import com.kaleert.nyagram.util.CommandTokenizer;
+import com.kaleert.nyagram.util.TextUtil;
 import com.kaleert.nyagram.validation.Validation;
 import com.kaleert.nyagram.pipeline.*;
 import lombok.extern.slf4j.Slf4j;
@@ -34,22 +36,26 @@ public class ValidationMiddleware implements CommandPreProcessor {
     @Override
     public Optional<CommandResult> process(CommandContext context, CommandMeta commandMeta) {
         try {
+            if ("fallback".equals(commandMeta.getFullCommandPath())) {
+                return Optional.empty();
+            }
+
             String text = context.getText();
             if (!StringUtils.hasText(text)) {
                 return Optional.of(CommandResult.error("Пустое сообщение"));
             }
 
             String commandPath = commandMeta.getFullCommandPath();
-            String argsString = text.substring(commandPath.length()).trim();
+            String argsString = text.length() >= commandPath.length()
+                    ? text.substring(commandPath.length()).trim()
+                    : "";
             List<String> tokens = CommandTokenizer.tokenize(argsString);
 
             List<Parameter> parameters = commandMeta.getMethodParameters();
             int tokenIndex = 0;
 
             int requiredParamsCount = (int) parameters.stream()
-                    .filter(p -> {
-                        return !isContextParameter(p);
-                    })
+                    .filter(this::isTokenParameter)
                     .filter(p -> {
                         com.kaleert.nyagram.command.CommandArgument argAnn = 
                             p.getAnnotation(com.kaleert.nyagram.command.CommandArgument.class);
@@ -59,13 +65,13 @@ public class ValidationMiddleware implements CommandPreProcessor {
 
             if (tokens.size() < requiredParamsCount) {
                 return Optional.of(CommandResult.error(
-                    String.format("Недостаточно аргументов. Ожидалось минимум %d, получено %d.\nИспользование: %s",
-                        requiredParamsCount, tokens.size(), commandMeta.getUsageSyntax())
+                    String.format("Недостаточно аргументов. Ожидалось минимум %d, получено %d.\nИспользование:\n%s",
+                        requiredParamsCount, tokens.size(), TextUtil.code(commandMeta.getUsageSyntax()))
                 ));
             }
 
             for (Parameter param : parameters) {
-                if (isContextParameter(param)) {
+                if (!isTokenParameter(param)) {
                     continue;
                 }
 
@@ -78,9 +84,7 @@ public class ValidationMiddleware implements CommandPreProcessor {
                     }
                 }
 
-                if (!isContextParameter(param)) {
-                    tokenIndex++;
-                }
+                tokenIndex++;
             }
 
             return Optional.empty();
@@ -88,8 +92,12 @@ public class ValidationMiddleware implements CommandPreProcessor {
         } catch (Exception e) {
             log.warn("Validation error for command {}: {}", 
                     commandMeta.getFullCommandPath(), e.getMessage());
-            return Optional.of(CommandResult.error("Ошибка валидации: " + e.getMessage()));
+            return Optional.of(CommandResult.error("Ошибка валидации: " + TextUtil.escapeHtml(e.getMessage())));
         }
+    }
+
+    private boolean isTokenParameter(Parameter param) {
+        return !isContextParameter(param) && !param.isAnnotationPresent(Flag.class);
     }
 
     private boolean isContextParameter(Parameter param) {

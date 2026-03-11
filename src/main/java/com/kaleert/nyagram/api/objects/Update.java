@@ -2,6 +2,7 @@ package com.kaleert.nyagram.api.objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -200,6 +201,32 @@ public class Update implements Serializable {
         if (businessMessage != null && businessMessage.getFrom() != null) return businessMessage.getFrom().getId();
         if (businessConnection != null) return businessConnection.getUser().getId();
 
+        return null;
+    }
+    
+    /**
+     * Универсальный метод для получения пользователя (инициатора события).
+     *
+     * @return объект User или null.
+     * @since 1.1.4
+     */
+    @JsonIgnore
+    public User getUser() {
+        if (message != null && message.getFrom() != null) return message.getFrom();
+        if (callbackQuery != null) return callbackQuery.getFrom();
+        if (inlineQuery != null) return inlineQuery.getFrom();
+        if (editedMessage != null && editedMessage.getFrom() != null) return editedMessage.getFrom();
+        if (myChatMember != null) return myChatMember.getFrom();
+        if (chatMember != null) return chatMember.getFrom();
+        if (chatJoinRequest != null) return chatJoinRequest.getFrom();
+        if (messageReaction != null && messageReaction.getUser() != null) return messageReaction.getUser();
+        if (pollAnswer != null && pollAnswer.getUser() != null) return pollAnswer.getUser();
+        if (chosenInlineResult != null) return chosenInlineResult.getFrom();
+        if (preCheckoutQuery != null) return preCheckoutQuery.getFrom();
+        if (shippingQuery != null) return shippingQuery.getFrom();
+        if (purchasedPaidMedia != null) return purchasedPaidMedia.getFrom();
+        if (businessMessage != null && businessMessage.getFrom() != null) return businessMessage.getFrom();
+        if (businessConnection != null) return businessConnection.getUser();
         return null;
     }
     

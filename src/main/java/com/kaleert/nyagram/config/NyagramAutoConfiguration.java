@@ -20,6 +20,7 @@ import com.kaleert.nyagram.security.spi.UserLevelProvider;
 import com.kaleert.nyagram.security.spi.UserPermissionProvider;
 import com.kaleert.nyagram.webhook.NyagramWebhookController;
 import com.kaleert.nyagram.webhook.WebhookLifecycleService;
+import com.kaleert.nyagram.i18n.LocaleResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -233,5 +234,11 @@ public class NyagramAutoConfiguration {
     @ConditionalOnMissingBean(TopicIdCache.class)
     public TopicIdCache topicIdCache() {
         return new InMemoryTopicIdCache();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean(LocaleResolver.class)
+    public LocaleResolver defaultLocaleResolver() {
+        return userId -> java.util.Locale.forLanguageTag("ru");
     }
 }

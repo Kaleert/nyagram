@@ -7,10 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -58,20 +56,17 @@ public class FileService {
                 config.getBotToken(), telegramFilePath);
         
         try {
-            InputStream inputStream = rawClient.get()
+            byte[] body = rawClient.get()
                     .uri(url)
                     .retrieve()
-                    .body(InputStream.class);
+                    .body(byte[].class);
 
-            if (inputStream == null) {
+            if (body == null || body.length == 0) {
                 throw new RuntimeException("Response body is empty");
             }
 
             Files.createDirectories(destination.getParent());
-            
-            try (inputStream) {
-                Files.copy(inputStream, destination, StandardCopyOption.REPLACE_EXISTING);
-            }
+            Files.write(destination, body);
             
             return destination;
 

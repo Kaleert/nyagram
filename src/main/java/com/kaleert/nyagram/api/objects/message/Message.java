@@ -263,7 +263,34 @@ public record Message(
     @JsonProperty("web_app_data") WebAppData webAppData,
     
     /** Инлайн-клавиатура под сообщением. */
-    @JsonProperty("reply_markup") InlineKeyboardMarkup replyMarkup
+    @JsonProperty("reply_markup") InlineKeyboardMarkup replyMarkup,
+
+    /** Бот, который отправил сообщение от имени бизнес-аккаунта. */
+    @JsonProperty("sender_business_bot") User senderBusinessBot,
+    
+    /** Уникальный идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id") String businessConnectionId,
+    
+    /** True, если сообщение было отправлено пользователем в оффлайне и доставлено позже. */
+    @JsonProperty("is_from_offline") Boolean isFromOffline,
+    
+    /** Идентификатор эффекта сообщения (например, огня или конфетти). */
+    @JsonProperty("effect_id") String effectId,
+    
+    /** True, если подпись отображается НАД медиафайлом (а не под ним). */
+    @JsonProperty("show_caption_above_media") Boolean showCaptionAboveMedia,
+    
+    /** Информация о платном контенте (за Telegram Stars). */
+    @JsonProperty("paid_media") com.kaleert.nyagram.api.objects.media.PaidMediaInfo paidMedia,
+    
+    /** Уведомление о возврате платежа. */
+    @JsonProperty("refunded_payment") com.kaleert.nyagram.api.objects.payments.RefundedPayment refundedPayment,
+    
+    /** True, если это "прямое сообщение" в канале. */
+    @JsonProperty("is_direct_message") Boolean isDirectMessage,
+    
+    /** True, если это предложенный пост (Suggested Post). */
+    @JsonProperty("is_suggested") Boolean isSuggested
 ) implements MaybeInaccessibleMessage {
 
     // --- Getters ---
@@ -847,6 +874,28 @@ public record Message(
      * @return объект InlineKeyboardMarkup или null.
      */
     public InlineKeyboardMarkup getReplyMarkup() { return replyMarkup; }
+
+    public User getSenderBusinessBot() { return senderBusinessBot; }
+    public String getBusinessConnectionId() { return businessConnectionId; }
+    public Boolean getIsFromOffline() { return isFromOffline; }
+    public String getEffectId() { return effectId; }
+    public Boolean getShowCaptionAboveMedia() { return showCaptionAboveMedia; }
+    public com.kaleert.nyagram.api.objects.media.PaidMediaInfo getPaidMedia() { return paidMedia; }
+    public com.kaleert.nyagram.api.objects.payments.RefundedPayment getRefundedPayment() { return refundedPayment; }
+    public Boolean getIsDirectMessage() { return isDirectMessage; }
+    public Boolean getIsSuggested() { return isSuggested; }
+
+    @JsonIgnore
+    public boolean hasPaidMedia() { return paidMedia != null; }
+
+    @JsonIgnore
+    public boolean hasEffect() { return effectId != null && !effectId.isBlank(); }
+
+    @JsonIgnore
+    public boolean isCaptionAbove() { return Boolean.TRUE.equals(showCaptionAboveMedia); }
+
+    @JsonIgnore
+    public boolean hasRefundedPayment() { return refundedPayment != null; }
     
     /**
      * Проверяет, содержит ли сообщение текст.
@@ -1144,7 +1193,7 @@ public record Message(
                videoChatParticipantsInvited != null || messageAutoDeleteTimerChanged != null ||
                successfulPayment != null || giveawayCreated != null ||
                giveaway != null || giveawayWinners != null || giveawayCompleted != null ||
-               boostAdded != null;
+               boostAdded != null || refundedPayment != null;
     }
     
     /**
@@ -1604,5 +1653,41 @@ public record Message(
             return "@" + senderChat.getUsername();
         }
         return getSenderDisplayName();
+    }
+    
+    /**
+     * Возвращает File ID главного медиафайла в сообщении (фото, видео, документ, войс и т.д.).
+     * @return File ID или null.
+     * @since 1.1.4
+     */
+    @JsonIgnore
+    public String getPrimaryFileId() {
+        if (hasPhoto()) return getBestPhotoId();
+        if (hasVideo()) return video.fileId();
+        if (hasDocument()) return document.fileId();
+        if (hasVoice()) return voice.fileId();
+        if (hasVideoNote()) return videoNote.fileId();
+        if (hasAudio()) return audio.fileId();
+        if (hasAnimation()) return animation.fileId();
+        if (hasSticker()) return sticker.fileId();
+        return null;
+    }
+
+    /**
+     * Возвращает тип главного медиафайла.
+     * @return "photo", "video", "document", "voice", "video_note", "audio", "animation", "sticker" или null.
+     * @since 1.1.4
+     */
+    @JsonIgnore
+    public String getPrimaryMediaType() {
+        if (hasPhoto()) return "photo";
+        if (hasVideo()) return "video";
+        if (hasDocument()) return "document";
+        if (hasVoice()) return "voice";
+        if (hasVideoNote()) return "video_note";
+        if (hasAudio()) return "audio";
+        if (hasAnimation()) return "animation";
+        if (hasSticker()) return "sticker";
+        return null;
     }
 }

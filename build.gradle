@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id 'java-library'
     id 'org.springframework.boot' version '3.2.0'
@@ -6,14 +8,13 @@ plugins {
     id "com.vanniktech.maven.publish" version "0.30.0"
 }
 
+def packageJson = new JsonSlurper().parse(file('package.json'))
 group = 'io.github.kaleert'
-version = '1.1.3'
+version = packageJson.version
 
 java {
     sourceCompatibility = '21'
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    toolchain { languageVersion = JavaLanguageVersion.of(21) }
 }
 
 repositories {
@@ -85,16 +86,14 @@ task generateDocs(type: JavaExec) {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-    
     signAllPublications()
-
     coordinates(group, "nyagram", version)
 
     pom {
         name = "Nyagram"
-        description = "Modern Java Telegram Bot Framework based on Spring Boot 3"
+        description = packageJson.description
         inceptionYear = "2025"
-        url = "https://nyagram.kaleert.pro"
+        url = packageJson.docsUrl
 
         licenses {
             license {
@@ -127,3 +126,31 @@ javadoc {
         addStringOption('Xdoclint:none', '-quiet') 
     }
 }
+
+processResources {
+    from(projectDir) {
+        include 'package.json'
+        into '.'
+    }
+}
+
+task syncReadmeVersions {
+    doLast {
+        def v = packageJson.version
+        ['Readme.md', 'Readme_RU.md'].each { fileName ->
+            def file = file(fileName)
+            if (file.exists()) {
+                def content = file.text
+
+                content = content.replaceAll(/(?<=version-)\d+\.\d+\.\d+(?=-red)/, v)
+
+                content = content.replaceAll(/(?<=nyagram:)\d+\.\d+\.\d+/, v)
+                content = content.replaceAll(/(?<=<version>)\d+\.\d+\.\d+(?=<\/version>)/, v)
+                file.text = content
+            }
+        }
+        println "✅ Synced Readme versions to ${v}"
+    }
+}
+
+classes.dependsOn syncReadmeVersions

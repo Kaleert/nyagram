@@ -62,6 +62,14 @@ public class CreateChatInviteLink extends BotApiMethod<ChatInviteLink> {
      */
     @JsonProperty("creates_join_request")
     private Boolean createsJoinRequest;
+    
+    /** Количество месяцев для подписки на чат (1-12). */
+    @JsonProperty("subscription_period")
+    private Integer subscriptionPeriod;
+    
+    /** Цена подписки в Telegram Stars за указанный период (1-2500). */
+    @JsonProperty("subscription_price")
+    private Integer subscriptionPrice;
 
     @Override
     public String getMethod() {

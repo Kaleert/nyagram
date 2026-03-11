@@ -64,6 +64,13 @@ public class CreateInvoiceLink extends BotApiMethod<String> {
      */
     @JsonProperty("prices") 
     private List<LabeledPrice> prices;
+    
+    /**
+     * Количество секунд, между которыми будут происходить регулярные списания.
+     * От 2592000 (30 дней) до 31536000 (365 дней).
+     */
+    @JsonProperty("subscription_period")
+    private Integer subscriptionPeriod;
 
     @Override public String getMethod() { return PATH; }
     @Override public String deserializeResponse(String answer) throws TelegramApiRequestException {

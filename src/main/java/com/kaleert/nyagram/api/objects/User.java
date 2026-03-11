@@ -39,7 +39,9 @@ public record User(
     @JsonProperty("can_read_all_group_messages") Boolean canReadAllGroupMessages,
     @JsonProperty("supports_inline_queries") Boolean supportsInlineQueries,
     @JsonProperty("can_connect_to_business") Boolean canConnectToBusiness,
-    @JsonProperty("has_main_web_app") Boolean hasMainWebApp
+    @JsonProperty("has_main_web_app") Boolean hasMainWebApp,
+    @JsonProperty("has_topics_enabled") Boolean hasTopicsEnabled,
+    @JsonProperty("allows_users_to_create_topics") Boolean allowsUsersToCreateTopics
 ) implements BotApiObject {
     
     /**
@@ -127,6 +129,9 @@ public record User(
      * @return Boolean.
      */
     public Boolean getHasMainWebApp() { return hasMainWebApp; }
+
+    public Boolean getHasTopicsEnabled() { return hasTopicsEnabled; }
+    public Boolean getAllowsUsersToCreateTopics() { return allowsUsersToCreateTopics; }
     
     /**
      * Возвращает полное имя пользователя (Имя + Фамилия).

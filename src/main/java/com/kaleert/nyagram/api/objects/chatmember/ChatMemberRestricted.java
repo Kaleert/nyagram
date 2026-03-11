@@ -46,7 +46,9 @@ public record ChatMemberRestricted(
     @JsonProperty("can_invite_users") Boolean canInviteUsers,
     @JsonProperty("can_pin_messages") Boolean canPinMessages,
     @JsonProperty("can_manage_topics") Boolean canManageTopics,
-    @JsonProperty("until_date") Integer untilDate
+    @JsonProperty("until_date") Integer untilDate,
+    @JsonProperty("tag") String tag,
+    @JsonProperty("can_edit_tag") Boolean canEditTag
 ) implements ChatMember {
 
     @Override

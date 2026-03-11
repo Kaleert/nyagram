@@ -134,4 +134,16 @@ public class InlineKeyboardBuilder {
         }
         return InlineKeyboardMarkup.builder().inlineKeyboard(rows).build();
     }
+    
+    /**
+     * Добавляет кнопку, при нажатии на которую текст копируется в буфер обмена (API 9.5).
+     *
+     * @param buttonText Текст на самой кнопке (например, "Копировать промокод").
+     * @param textToCopy Текст для буфера обмена (например, "NYAGRAM-2026").
+     * @return Текущий билдер.
+     */
+    public InlineKeyboardBuilder copyButton(String buttonText, String textToCopy) {
+        currentRow.add(InlineKeyboardButton.copyText(buttonText, textToCopy));
+        return this;
+    }
 }

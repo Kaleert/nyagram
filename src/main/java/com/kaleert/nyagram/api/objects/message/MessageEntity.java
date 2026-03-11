@@ -31,7 +31,9 @@ public record MessageEntity(
     @JsonProperty("url") String url,
     @JsonProperty("user") User user,
     @JsonProperty("language") String language,
-    @JsonProperty("custom_emoji_id") String customEmojiId
+    @JsonProperty("custom_emoji_id") String customEmojiId,
+    @JsonProperty("unix_time") Integer unixTime,
+    @JsonProperty("date_time_format") String dateTimeFormat
 ) implements BotApiObject {
     
     /** Тип сущности: упоминание пользователя (@username). */
@@ -90,6 +92,9 @@ public record MessageEntity(
     
     /** Тип сущности: кастомный эмодзи. */
     public static final String CUSTOM_EMOJI = "custom_emoji";
+    
+    /** Тип сущности: отформатированная дата и время. */
+    public static final String DATE_TIME = "date_time";
     
     /**
      * Извлекает текст сущности из полного текста сообщения.

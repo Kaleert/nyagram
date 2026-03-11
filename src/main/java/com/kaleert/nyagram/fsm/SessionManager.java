@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * Сервис управления пользовательскими сессиями (FSM).
@@ -41,7 +44,9 @@ public class SessionManager {
      * @return Объект сессии или {@code null}, если сессия не найдена.
      */
     public UserSession getSession(Long userId) {
-        return sessionStore.get(userId).orElse(null);
+        return sessionStore.get(userId)
+                .map(this::attachPersistence)
+                .orElse(null);
     }
     
     /**
@@ -58,9 +63,9 @@ public class SessionManager {
     public UserSession startSession(Long userId, Long chatId, String initialState) {
         UserSession session = new UserSession(userId, chatId);
         session.setState(initialState);
-        sessionStore.save(session);
+        saveSession(session);
         log.debug("Started FSM session for user {} in state {}", userId, initialState);
-        return session;
+        return attachPersistence(session);
     }
     
     /**
@@ -74,13 +79,18 @@ public class SessionManager {
      * @param newState Новое состояние.
      */
     public void updateState(Long userId, String newState) {
-        Optional<UserSession> sessionOpt = sessionStore.get(userId);
-        if (sessionOpt.isPresent()) {
-            UserSession session = sessionOpt.get();
+        UserSession session = getSession(userId);
+        if (session != null) {
             session.setState(newState);
-            session.setLastUpdatedAt(java.time.LocalDateTime.now());
-            sessionStore.save(session);
         }
+    }
+
+    public void saveSession(UserSession session) {
+        if (session == null) {
+            return;
+        }
+
+        sessionStore.save(toStoredSession(session));
     }
     
     /**
@@ -106,5 +116,66 @@ public class SessionManager {
     @Scheduled(fixedRateString = "${nyagram.fsm.cleanup-interval:60000}")
     public void cleanup() {
         sessionStore.cleanupExpired(sessionTtlMinutes);
+    }
+
+    private UserSession attachPersistence(UserSession session) {
+        if (session instanceof ManagedUserSession managed) {
+            return managed;
+        }
+
+        return new ManagedUserSession(session, this::saveSession);
+    }
+
+    private UserSession toStoredSession(UserSession session) {
+        Map<String, Object> copiedData = new ConcurrentHashMap<>();
+        if (session.getData() != null) {
+            copiedData.putAll(session.getData());
+        }
+
+        return new UserSession(
+                session.getUserId(),
+                session.getChatId(),
+                session.getState(),
+                copiedData,
+                session.getCreatedAt(),
+                session.getLastUpdatedAt()
+        );
+    }
+
+    private static final class ManagedUserSession extends UserSession {
+
+        private final transient Consumer<UserSession> persister;
+
+        private ManagedUserSession(UserSession delegate, Consumer<UserSession> persister) {
+            super(
+                    delegate.getUserId(),
+                    delegate.getChatId(),
+                    delegate.getState(),
+                    new ConcurrentHashMap<>(delegate.getData() != null ? delegate.getData() : Map.of()),
+                    delegate.getCreatedAt(),
+                    delegate.getLastUpdatedAt()
+            );
+            this.persister = persister;
+        }
+
+        @Override
+        public void setState(String state) {
+            super.setState(state);
+            super.setLastUpdatedAt(LocalDateTime.now());
+            persister.accept(this);
+        }
+
+        @Override
+        public void setData(Map<String, Object> data) {
+            super.setData(data != null ? new ConcurrentHashMap<>(data) : new ConcurrentHashMap<>());
+            super.setLastUpdatedAt(LocalDateTime.now());
+            persister.accept(this);
+        }
+
+        @Override
+        public void putData(String key, Object value) {
+            super.putData(key, value);
+            persister.accept(this);
+        }
     }
 }

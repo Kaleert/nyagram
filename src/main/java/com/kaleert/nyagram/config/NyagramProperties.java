@@ -37,4 +37,10 @@ public class NyagramProperties implements NyagramBotConfig {
     private List<String> allowedUpdates;
     
     private String apiUrl = "https://api.telegram.org";
+
+    /**
+     * Включает проверку новых версий Nyagram на GitHub при запуске.
+     * @since 1.1.4
+     */
+    private boolean checkUpdates = true;
 }

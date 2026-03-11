@@ -31,7 +31,9 @@ public record KeyboardButton(
     @JsonProperty("request_poll") KeyboardButtonPollType requestPoll,
     @JsonProperty("web_app") WebAppInfo webApp,
     @JsonProperty("request_user") KeyboardButtonRequestUser requestUser,
-    @JsonProperty("request_chat") KeyboardButtonRequestChat requestChat
+    @JsonProperty("request_chat") KeyboardButtonRequestChat requestChat,
+    @JsonProperty("icon_custom_emoji_id") String iconCustomEmojiId,
+    @JsonProperty("style") String style
 ) implements BotApiObject {
 
     /**
@@ -41,7 +43,7 @@ public record KeyboardButton(
      * @return объект кнопки.
      */
     public static KeyboardButton text(String text) {
-        return new KeyboardButton(text, null, null, null, null, null, null);
+        return new KeyboardButton(text, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -54,8 +56,8 @@ public record KeyboardButton(
      * @return объект кнопки.
      */
     public static KeyboardButton requestContact(String text) {
-        return new KeyboardButton(text, true, null, null, null, null, null);
-    }
+                return new KeyboardButton(text, true, null, null, null, null, null, null, null);
+            }
 
     /**
      * Создает кнопку запроса текущей геолокации.
@@ -64,7 +66,7 @@ public record KeyboardButton(
      * @return объект кнопки.
      */
     public static KeyboardButton requestLocation(String text) {
-        return new KeyboardButton(text, null, true, null, null, null, null);
+        return new KeyboardButton(text, null, true, null, null, null, null, null, null);
     }
 
     /**
@@ -80,7 +82,7 @@ public record KeyboardButton(
      */
     public static KeyboardButton requestUser(String text, int requestId, boolean bot) {
         return new KeyboardButton(text, null, null, null, null, 
-            new KeyboardButtonRequestUser(requestId, bot, null), null);
+            new KeyboardButtonRequestUser(requestId, bot, null), null, text, text);
     }
     
     /**
@@ -96,7 +98,7 @@ public record KeyboardButton(
      */
     public static KeyboardButton requestChat(String text, int requestId, boolean channel) {
         return new KeyboardButton(text, null, null, null, null, null, 
-            new KeyboardButtonRequestChat(requestId, channel, null, null, null, null, null, null));
+            new KeyboardButtonRequestChat(requestId, channel, null, null, null, null, null, null), text, text);
     }
     
     /**

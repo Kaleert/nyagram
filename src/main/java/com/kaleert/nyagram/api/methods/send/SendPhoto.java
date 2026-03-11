@@ -97,6 +97,18 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор эффекта сообщения (например, ID анимации огня или сердечек). */
+    @JsonProperty("message_effect_id")
+    private String messageEffectId;
+
+    /** Идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id")
+    private String businessConnectionId;
+
+    /** Если True, подпись будет отображаться НАД медиафайлом (по умолчанию False - под ним). */
+    @JsonProperty("show_caption_above_media")
+    private Boolean showCaptionAboveMedia;
+
     @Override
     public String getMethod() {
         return PATH;
@@ -208,5 +220,24 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
     @Override
     public Map<String, InputFile> getFiles() {
         return photo != null ? Map.of("photo", photo) : Map.of();
+    }
+
+    /**
+     * Отображает подпись над медиафайлом.
+     * @return текущий билдер.
+     */
+    public SendPhoto captionAbove() {
+        this.showCaptionAboveMedia = true;
+        return this;
+    }
+    
+    /**
+     * Добавляет эффект к сообщению (например, огонь, конфетти).
+     * @param effectId Уникальный ID эффекта.
+     * @return текущий билдер.
+     */
+    public SendPhoto withEffect(String effectId) {
+        this.messageEffectId = effectId;
+        return this;
     }
 }

@@ -30,7 +30,10 @@ public record Video(
     @JsonProperty("thumbnail") PhotoSize thumbnail,
     @JsonProperty("file_name") String fileName,
     @JsonProperty("mime_type") String mimeType,
-    @JsonProperty("file_size") Long fileSize
+    @JsonProperty("file_size") Long fileSize,
+    @JsonProperty("cover") java.util.List<PhotoSize> cover,
+    @JsonProperty("start_timestamp") Integer startTimestamp,
+    @JsonProperty("qualities") java.util.List<VideoQuality> qualities
 ) implements BotApiObject {
 
     /**

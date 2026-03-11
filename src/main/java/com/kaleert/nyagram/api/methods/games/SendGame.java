@@ -81,6 +81,13 @@ public class SendGame extends BotApiMethod<Message> {
     @JsonProperty("reply_markup")
     private InlineKeyboardMarkup replyMarkup;
 
+    @JsonProperty("message_effect_id")
+    private String messageEffectId;
+
+    /** Идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id")
+    private String businessConnectionId;
+
     @Override
     public String getMethod() {
         return PATH;

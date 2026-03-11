@@ -63,6 +63,14 @@ public class SendLocation extends BotApiMethod<Message> {
     @JsonProperty("proximity_alert_radius")
     private Integer proximityAlertRadius;
 
+    /** Идентификатор эффекта сообщения (например, ID анимации огня или сердечек). */
+    @JsonProperty("message_effect_id")
+    private String messageEffectId;
+
+    /** Идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id")
+    private String businessConnectionId;
+
     @Override
     public String getMethod() {
         return PATH;

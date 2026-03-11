@@ -31,7 +31,8 @@ public record Chat(
     @JsonProperty("username") String username,
     @JsonProperty("first_name") String firstName,
     @JsonProperty("last_name") String lastName,
-    @JsonProperty("is_forum") Boolean isForum
+    @JsonProperty("is_forum") Boolean isForum,
+    @JsonProperty("is_direct_messages") Boolean isDirectMessages
 ) implements BotApiObject {
     
     /**
@@ -128,6 +129,11 @@ public record Chat(
      */
     @JsonIgnore
     public boolean isChannelChat() { return isChannel(); }
+
+    public Boolean getIsDirectMessages() { return isDirectMessages; }
+    
+    @JsonIgnore
+    public boolean isDirectMessagesChat() { return Boolean.TRUE.equals(isDirectMessages); }
     
     /**
      * Возвращает лучшее доступное имя для отображения чата.

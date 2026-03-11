@@ -2,12 +2,18 @@ package com.kaleert.nyagram.feature.system;
 
 import com.kaleert.nyagram.api.methods.send.SendChatAction;
 import com.kaleert.nyagram.client.NyagramClient;
+import com.kaleert.nyagram.api.objects.ChatAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.PreDestroy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -27,19 +33,25 @@ import java.util.function.Supplier;
 public class ChatActionService {
 
     private final NyagramClient client;
+    private final ConcurrentHashMap<Long, ActiveAction> activeActions = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2, r -> {
+        Thread thread = new Thread(r, "nyagram-chat-action");
+        thread.setDaemon(true);
+        return thread;
+    });
     
     /**
      * Отправляет однократный статус действия.
      * Статус виден пользователю около 5 секунд.
      *
      * @param chatId ID чата.
-     * @param action Тип действия (например, "typing").
+     * @param action Тип действия (например, TYPING).
      */
-    public void send(Long chatId, String action) {
+    public void send(Long chatId, ChatAction action) {
         try {
             SendChatAction msg = SendChatAction.builder()
                     .chatId(chatId.toString())
-                    .action(action)
+                    .action(action.getValue())
                     .build();
             client.execute(msg);
         } catch (Exception e) {
@@ -48,7 +60,7 @@ public class ChatActionService {
     }
     
     /**
-     * Отправляет статус "печатает..." (typing).
+     * Отправляет статус "печатает..." (TYPING).
      * <p>
      * Сообщает пользователю, что бот готовит текстовый ответ.
      * Статус исчезает автоматически через 5 секунд или при отправке сообщения.
@@ -57,25 +69,51 @@ public class ChatActionService {
      * @param chatId Уникальный идентификатор чата.
      */
     public void typing(Long chatId) {
-        send(chatId, "typing");
+        send(chatId, ChatAction.TYPING);
     }
     
     /**
-     * Отправляет статус "загружает фото..." (upload_photo).
+     * Отправляет статус "загружает фото..." (UPLOAD_PHOTO).
      *
      * @param chatId ID чата.
      */
     public void uploadPhoto(Long chatId) {
-        send(chatId, "upload_photo");
+        send(chatId, ChatAction.UPLOAD_PHOTO);
     }
     
     /**
-     * Отправляет статус "записывает голосовое..." (record_voice).
+     * Отправляет статус "записывает голосовое..." (RECORD_VOICE).
      *
      * @param chatId ID чата.
      */
     public void recordVoice(Long chatId) {
-        send(chatId, "record_voice");
+        send(chatId, ChatAction.RECORD_VOICE);
+    }
+
+    public void start(Long chatId, ChatAction action) {
+        activeActions.compute(chatId, (id, current) -> {
+            if (current != null && current.action().equals(action) && !current.future().isCancelled()) {
+                return current;
+            }
+            if (current != null) {
+                current.future().cancel(true);
+            }
+
+            ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
+                    () -> send(chatId, action),
+                    0,
+                    4,
+                    TimeUnit.SECONDS
+            );
+            return new ActiveAction(action, future);
+        });
+    }
+
+    public void stop(Long chatId) {
+        ActiveAction action = activeActions.remove(chatId);
+        if (action != null) {
+            action.future().cancel(true);
+        }
     }
     
     /**
@@ -91,7 +129,7 @@ public class ChatActionService {
      */
     @Async
     public <T> CompletableFuture<T> executeWithTyping(Long chatId, Supplier<T> task) {
-        return executeWithAction(chatId, "typing", task);
+        return executeWithAction(chatId, ChatAction.TYPING, task);
     }
     
     /**
@@ -107,30 +145,25 @@ public class ChatActionService {
      * @param <T> Тип возвращаемого значения задачи.
      * @return Future с результатом выполнения задачи.
      */
-    public <T> CompletableFuture<T> executeWithAction(Long chatId, String action, Supplier<T> task) {
+    public <T> CompletableFuture<T> executeWithAction(Long chatId, ChatAction action, Supplier<T> task) {
         return CompletableFuture.supplyAsync(() -> {
-            final boolean[] running = {true};
-            
-            Thread statusThread = new Thread(() -> {
-                while (running[0]) {
-                    send(chatId, action);
-                    try {
-                        TimeUnit.SECONDS.sleep(4);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        break;
-                    }
-                }
-            });
-            statusThread.setDaemon(true);
-            statusThread.start();
+            start(chatId, action);
 
             try {
                 return task.get();
             } finally {
-                running[0] = false;
-                statusThread.interrupt();
+                stop(chatId);
             }
         });
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        activeActions.values().forEach(action -> action.future().cancel(true));
+        activeActions.clear();
+        scheduler.shutdownNow();
+    }
+
+    private record ActiveAction(ChatAction action, ScheduledFuture<?> future) {
     }
 }

@@ -110,6 +110,18 @@ public class SendVoice extends BotApiMethod<Message> implements MultipartRequest
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор эффекта сообщения (например, ID анимации огня или сердечек). */
+    @JsonProperty("message_effect_id")
+    private String messageEffectId;
+
+    /** Идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id")
+    private String businessConnectionId;
+
+    /** Если True, подпись будет отображаться НАД медиафайлом (по умолчанию False - под ним). */
+    @JsonProperty("show_caption_above_media")
+    private Boolean showCaptionAboveMedia;
+
     @Override
     public String getMethod() {
         return PATH;
@@ -174,5 +186,24 @@ public class SendVoice extends BotApiMethod<Message> implements MultipartRequest
                 .chatId(chatId.toString())
                 .voice(new InputFile(file))
                 .build();
+    }
+
+    /**
+     * Отображает подпись над медиафайлом.
+     * @return текущий билдер.
+     */
+    public SendVoice captionAbove() {
+        this.showCaptionAboveMedia = true;
+        return this;
+    }
+    
+    /**
+     * Добавляет эффект к сообщению (например, огонь, конфетти).
+     * @param effectId Уникальный ID эффекта.
+     * @return текущий билдер.
+     */
+    public SendVoice withEffect(String effectId) {
+        this.messageEffectId = effectId;
+        return this;
     }
 }

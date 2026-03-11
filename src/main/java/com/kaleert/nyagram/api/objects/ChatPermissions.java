@@ -43,7 +43,8 @@ public record ChatPermissions(
     @JsonProperty("can_change_info") Boolean canChangeInfo,
     @JsonProperty("can_invite_users") Boolean canInviteUsers,
     @JsonProperty("can_pin_messages") Boolean canPinMessages,
-    @JsonProperty("can_manage_topics") Boolean canManageTopics
+    @JsonProperty("can_manage_topics") Boolean canManageTopics,
+    @JsonProperty("can_edit_tag") Boolean canEditTag
 ) implements BotApiObject {
     
     /**

@@ -9,6 +9,7 @@ import com.kaleert.nyagram.core.spi.RawUpdateHandler;
 import com.kaleert.nyagram.core.spi.UpdateInterceptor;
 import com.kaleert.nyagram.dispatcher.CommandDispatcher;
 import com.kaleert.nyagram.dispatcher.EventDispatcher;
+import com.kaleert.nyagram.i18n.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,8 @@ public class UpdateProcessor {
     
     private final Optional<RawUpdateHandler> rawUpdateHandler;
     private final List<UpdateInterceptor> interceptors;
+    private final Optional<LocaleService> localeService;
+    private final Optional<LocaleResolver> localeResolver;
     
     /**
      * Асинхронно обрабатывает входящее обновление.
@@ -78,7 +81,7 @@ public class UpdateProcessor {
                 processingFuture = CompletableFuture.completedFuture(true);
             } 
             
-            else if (update.hasMessage() && update.isCommand()) {
+            else if (update.hasMessage()) {
                 processingFuture = commandDispatcher.dispatch(update)
                         .thenApply(result -> true)
                         .exceptionally(ex -> {
@@ -88,7 +91,12 @@ public class UpdateProcessor {
             } 
             
             else if (update.hasCallbackQuery()) {
-                CommandContext context = new CommandContext(update, nyagramClient);
+                CommandContext context = new CommandContext(
+                    update, 
+                    nyagramClient, 
+                    localeService.orElse(null), 
+                    localeResolver.orElse(null)
+                );
                 callbackDispatcher.dispatch(context);
                 processingFuture = CompletableFuture.completedFuture(true);
             }

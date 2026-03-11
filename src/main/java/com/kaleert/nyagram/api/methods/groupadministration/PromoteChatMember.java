@@ -130,6 +130,12 @@ public class PromoteChatMember extends BotApiMethodBoolean {
     @JsonProperty("can_manage_topics")
     private Boolean canManageTopics;
 
+    @JsonProperty("can_manage_direct_messages")
+    private Boolean canManageDirectMessages;
+    
+    @JsonProperty("can_manage_tags")
+    private Boolean canManageTags;
+
     @Override
     public String getMethod() {
         return PATH;
@@ -173,7 +179,10 @@ public class PromoteChatMember extends BotApiMethodBoolean {
                 .canPostStories(true)
                 .canEditStories(true)
                 .canDeleteStories(true)
-                .canManageTopics(true)
+                .canManageTopics(
+                    true)
+                .canManageDirectMessages(true)
+                .canManageTags(true)
                 .isAnonymous(false)
                 .build();
     }

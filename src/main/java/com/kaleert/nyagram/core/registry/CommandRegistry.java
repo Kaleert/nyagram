@@ -52,14 +52,12 @@ public class CommandRegistry implements BeanPostProcessor {
     @Getter
     private final Map<String, CommandMeta> commandMap = new ConcurrentHashMap<>();
     
-    // Кэш отсортированных ключей для быстрого поиска по префиксу (Longest Match First)
     private final List<String> sortedCommandKeys = new ArrayList<>();
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) {
         Class<?> beanClass = bean.getClass();
         
-        // Снимаем CGLIB прокси-обертку, если она есть, чтобы добраться до аннотаций
         if (beanClass.getName().contains("$$")) {
             beanClass = beanClass.getSuperclass();
         }
@@ -69,12 +67,9 @@ public class CommandRegistry implements BeanPostProcessor {
             return bean;
         }
 
-        // Если value пустое -> режим "Контроллер" (много разных команд в одном классе)
-        // Если value есть -> режим "Команда" (корневая команда + подкоманды)
         String rootValue = classAnn.value().trim();
         boolean isControllerMode = !StringUtils.hasText(rootValue);
 
-        // Находим все методы, помеченные @CommandHandler
         List<Method> handlers = Arrays.stream(beanClass.getDeclaredMethods())
                 .filter(m -> AnnotatedElementUtils.findMergedAnnotation(m, CommandHandler.class) != null)
                 .collect(Collectors.toList());
@@ -83,11 +78,10 @@ public class CommandRegistry implements BeanPostProcessor {
             return bean;
         }
 
-        // Валидация для режима "Команда": не должно быть конфликтующих дефолтных хендлеров
         if (!isControllerMode && handlers.size() > 1) {
             long defaultHandlersCount = handlers.stream()
                     .map(m -> AnnotatedElementUtils.findMergedAnnotation(m, CommandHandler.class))
-                    .filter(h -> h.value().isEmpty()) // Пустой value = дефолтный обработчик корня
+                    .filter(h -> h.value().isEmpty())
                     .count();
             
             if (defaultHandlersCount > 1) {
@@ -101,7 +95,6 @@ public class CommandRegistry implements BeanPostProcessor {
             registerHandler(bean, method, rootValue, methodAnn, isControllerMode);
         }
 
-        // Обновляем ключи поиска
         refreshSearchKeys();
         
         return bean;
@@ -111,28 +104,20 @@ public class CommandRegistry implements BeanPostProcessor {
         String methodValue = handler.value().trim();
         Set<String> triggers = new HashSet<>();
 
-        // 1. Формирование основного пути
         if (isController) {
-            // В режиме контроллера метод сам определяет полный путь (например, "/start")
             if (StringUtils.hasText(methodValue)) {
                 triggers.add(normalize(methodValue));
             }
         } else {
-            // В режиме команды путь строится от корня (например, "/settings" + "group" -> "/settings group")
             triggers.add(buildPath(root, methodValue));
         }
 
-        // 2. Обработка алиасов
         for (String alias : handler.aliases()) {
             if (!StringUtils.hasText(alias)) continue;
             
             if (isController) {
-                // В контроллере алиас самостоятелен ("help", "помощь")
                 triggers.add(normalize(alias));
             } else {
-                // В режиме команды:
-                // Если это дефолтный метод (methodValue пуст), то алиас относится к корню ("/rasp", "рп")
-                // Если это подкоманда, то алиас относится к ней ("/test broadcast", "/test bc")
                 if (methodValue.isEmpty()) {
                     triggers.add(normalize(alias)); 
                 } else {
@@ -141,10 +126,8 @@ public class CommandRegistry implements BeanPostProcessor {
             }
         }
 
-        // 3. Регистрация всех триггеров
         for (String path : triggers) {
             try {
-                // Пытаемся открыть доступ к приватному методу
                 if (!method.canAccess(bean)) {
                     method.setAccessible(true);
                 }
@@ -162,24 +145,20 @@ public class CommandRegistry implements BeanPostProcessor {
     private CommandMeta buildCommandMeta(Object bean, Method method, String fullPath, CommandHandler handler) throws IllegalAccessException {
         MethodHandle methodHandle = MethodHandles.lookup().unreflect(method).bindTo(bean);
         
-        // --- 1. Описание ---
         String description = handler.description();
         if (!StringUtils.hasText(description)) {
-            // Если у метода нет описания, берем из класса (только если это дефолтный метод корневой команды)
             BotCommand classAnn = bean.getClass().getAnnotation(BotCommand.class);
             if (classAnn != null && StringUtils.hasText(classAnn.description())) {
                 description = classAnn.description();
             }
         }
 
-        // --- 2. Права (Permissions) ---
         Set<String> permissions = new HashSet<>();
         RequiresPermission permAnn = AnnotatedElementUtils.findMergedAnnotation(method, RequiresPermission.class);
         if (permAnn != null) {
             permissions.add(permAnn.value());
         }
 
-        // --- 3. Уровень доступа (Level) ---
         CommandMeta.LevelRequirement levelReq;
         LevelRequired levelAnn = AnnotatedElementUtils.findMergedAnnotation(method, LevelRequired.class);
         if (levelAnn != null) {
@@ -188,7 +167,6 @@ public class CommandRegistry implements BeanPostProcessor {
             levelReq = new CommandMeta.LevelRequirement(0, Integer.MAX_VALUE, AccessDeniedAction.NOTIFY);
         }
 
-        // --- 4. Rate Limiting ---
         CommandMeta.RateLimitMeta rateLimit = null;
         RateLimit rateLimitAnn = AnnotatedElementUtils.findMergedAnnotation(method, RateLimit.class);
         if (rateLimitAnn != null) {
@@ -199,11 +177,9 @@ public class CommandRegistry implements BeanPostProcessor {
             );
         }
 
-        // --- 5. Асинхронность ---
         AsyncMode asyncAnn = AnnotatedElementUtils.findMergedAnnotation(method, AsyncMode.class);
         AsyncMode.Mode asyncMode = (asyncAnn != null) ? asyncAnn.value() : AsyncMode.Mode.SEQUENTIAL;
 
-        // --- 6. Анализ аргументов (Usage Syntax) ---
         Parameter[] parameters = method.getParameters();
         int minArgs = 0;
         int maxArgs = 0;
@@ -212,17 +188,15 @@ public class CommandRegistry implements BeanPostProcessor {
         for (int i = 0; i < parameters.length; i++) {
             Parameter param = parameters[i];
 
-            // Пропускаем служебные аргументы
             if (isContextParameter(param.getType())) {
                 continue;
             }
 
-            // Обработка VarArgs (String...)
             if (param.isVarArgs()) {
                 CommandArgument argAnn = param.getAnnotation(CommandArgument.class);
                 String name = (argAnn != null && StringUtils.hasText(argAnn.value())) ? argAnn.value() : "args";
                 usageBuilder.append(" [").append(name).append("...]");
-                maxArgs = Integer.MAX_VALUE; // Бесконечное кол-во
+                maxArgs = Integer.MAX_VALUE;
                 break;
             }
 
@@ -270,13 +244,11 @@ public class CommandRegistry implements BeanPostProcessor {
 
         String searchKey = text.trim().toLowerCase();
 
-        // 1. Прямое совпадение (например, "/start")
         CommandMeta directMatch = commandMap.get(searchKey);
         if (directMatch != null) {
             return directMatch;
         }
 
-        // 2. Поиск по префиксу (например, "/find текст")
         for (String key : sortedCommandKeys) {
             if (key.isEmpty()) continue;
             if (searchKey.startsWith(key + " ")) {
@@ -284,7 +256,6 @@ public class CommandRegistry implements BeanPostProcessor {
             }
         }
         
-        // 3. Если ничего не нашли, проверяем, есть ли "дефолтный" обработчик (для простого текста)
         if (commandMap.containsKey("")) {
             return commandMap.get("");
         }
@@ -296,8 +267,6 @@ public class CommandRegistry implements BeanPostProcessor {
         synchronized (sortedCommandKeys) {
             sortedCommandKeys.clear();
             sortedCommandKeys.addAll(commandMap.keySet());
-            // Сортировка: сначала длинные, потом короткие
-            // Если длина равна, сортируем по алфавиту
             sortedCommandKeys.sort((k1, k2) -> {
                 int lenComp = Integer.compare(k2.length(), k1.length());
                 if (lenComp != 0) return lenComp;
@@ -314,7 +283,6 @@ public class CommandRegistry implements BeanPostProcessor {
         if (!StringUtils.hasText(sub)) {
             return normalize(root);
         }
-        // Убираем слэши у подкоманд для чистоты (например, root="/test", sub="/run" -> "/test run")
         String cleanSub = sub.trim().replaceAll("^/+", "");
         return (normalize(root) + " " + cleanSub.toLowerCase()).trim();
     }
