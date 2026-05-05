@@ -146,4 +146,37 @@ public class InlineKeyboardBuilder {
         currentRow.add(InlineKeyboardButton.copyText(buttonText, textToCopy));
         return this;
     }
+
+    /**
+     * Добавляет кнопку с callback-данными и кастомным стилем в текущий ряд.
+     *
+     * @param text Текст на кнопке.
+     * @param callbackData Данные, которые придут боту при нажатии (макс. 64 байта).
+     * @param style Стиль кнопки (primary, success, danger).
+     * 
+     * @since 1.1.5
+     * 
+     * @return Текущий билдер.
+     */
+    public InlineKeyboardBuilder button(String text, String callbackData, String style) {
+        currentRow.add(InlineKeyboardButton.builder()
+                .text(text)
+                .callbackData(callbackData)
+                .style(style)
+                .build());
+        return this;
+    }
+
+    /**
+     * Универсальный метод для добавления любой готовой кнопки.
+     * 
+     * @param button Готовый объект InlineKeyboardButton.
+     * @return Текущий билдер.
+     * 
+     * @since 1.1.5
+     */
+    public InlineKeyboardBuilder add(InlineKeyboardButton button) {
+        currentRow.add(button);
+        return this;
+    }
 }

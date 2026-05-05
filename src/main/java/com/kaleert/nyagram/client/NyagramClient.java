@@ -13,8 +13,12 @@ import com.kaleert.nyagram.api.objects.File;
 import com.kaleert.nyagram.api.methods.GetFile;
 import com.kaleert.nyagram.client.retry.ExponentialBackoffStrategy;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
+import com.kaleert.nyagram.client.proxy.NyagramProxy;
+import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
+import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -54,7 +58,7 @@ public class NyagramClient {
     private final TokenBucketRateLimiter rateLimiter;
     private final NyagramBotConfig botConfig;
     private final ExponentialBackoffStrategy backoffStrategy;
-
+    private final ObjectProvider<NyagramProxyProvider> proxyProvider;
     private final Map<Class<?>, Boolean> multipartCache = new ConcurrentHashMap<>();
 
     private static final int MAX_RETRIES = 3;
@@ -77,13 +81,15 @@ public class NyagramClient {
             ObjectMapper objectMapper,
             AdvancedMultipartBuilder multipartBuilder,
             @Qualifier("botTaskExecutor") Executor taskExecutor,
-            ExponentialBackoffStrategy backoffStrategy
+            ExponentialBackoffStrategy backoffStrategy,
+            ObjectProvider<NyagramProxyProvider> proxyProvider
     ) {
         this.botConfig = config;
         this.objectMapper = objectMapper;
         this.multipartBuilder = multipartBuilder;
         this.taskExecutor = taskExecutor;
         this.backoffStrategy = backoffStrategy;
+        this.proxyProvider = proxyProvider;
         this.rateLimiter = new TokenBucketRateLimiter(30, Duration.ofSeconds(1));
 
         String baseUrl = config.getApiUrl().endsWith("/") 
@@ -134,7 +140,13 @@ public class NyagramClient {
 
     private <T extends Serializable> T executeWithRetry(BotApiMethod<T> method, int attempt, long unusedBackoff) {
         rateLimiter.acquire();
-
+        
+        NyagramProxy currentProxy = null;
+        if (proxyProvider.getIfAvailable() != null) {
+            currentProxy = proxyProvider.getIfAvailable().getProxy();
+            ProxyContextHolder.set(currentProxy);
+        }
+        
         try {
             return executeInternal(method);
 
@@ -157,6 +169,10 @@ public class NyagramClient {
             throw e;
 
         } catch (ResourceAccessException | HttpServerErrorException e) {
+            if (proxyProvider.getIfAvailable() != null && currentProxy != null) {
+                proxyProvider.getIfAvailable().onProxyError(currentProxy, e);
+            }
+            
             if (attempt >= MAX_RETRIES) {
                 throw new TelegramNetworkException("Max retries exceeded", method.getMethod(), e);
             }
@@ -170,6 +186,8 @@ public class NyagramClient {
         } catch (Exception e) {
             log.error("❌ Unexpected error executing {}", method.getMethod(), e);
             throw new RuntimeException("Unexpected error in NyagramClient", e);
+        } finally {
+            ProxyContextHolder.clear();
         }
     }
 

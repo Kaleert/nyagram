@@ -47,5 +47,8 @@ public class BroadcastEvents {
         /** Общее время выполнения в миллисекундах. */
         private final long durationMs;
         
+        /** ID администратора, запустившего рассылку. */
+        private final Integer senderAdminId;
+        
     }
 }

@@ -40,6 +40,5 @@ public class GetAvailableGifts extends BotApiMethod<Gifts> {
 
     @Override
     public void validate() {
-        // Метод не требует параметров
     }
 }

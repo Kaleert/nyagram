@@ -80,5 +80,11 @@ public enum EventType {
     /**
      * Пользователь изменил реакцию на сообщение.
      */
-    MESSAGE_REACTION;
+    MESSAGE_REACTION,
+    
+    /**
+     * Создан управляемый бот или изменен его токен.
+     * @since 1.1.5
+     */
+    MANAGED_BOT_UPDATED;
 }

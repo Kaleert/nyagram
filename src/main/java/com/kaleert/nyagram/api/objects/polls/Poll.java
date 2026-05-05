@@ -25,6 +25,9 @@ import java.util.Optional;
  * @param explanationEntities Сущности в объяснении.
  * @param openPeriod Время жизни опроса в секундах.
  * @param closeDate Дата автоматического закрытия опроса.
+ * @param allowsRevoting True, если пользователи могут изменить свой голос.
+ * @param description Дополнительное описание опроса.
+ * @param descriptionEntities Сущности в дополнительном описании опроса.
  *
  * @since 1.0.0
  */
@@ -42,7 +45,10 @@ public record Poll(
     @JsonProperty("explanation") String explanation,
     @JsonProperty("explanation_entities") List<MessageEntity> explanationEntities,
     @JsonProperty("open_period") Integer openPeriod,
-    @JsonProperty("close_date") Integer closeDate
+    @JsonProperty("close_date") Integer closeDate,
+    @JsonProperty("allows_revoting") Boolean allowsRevoting,
+    @JsonProperty("description") String description,
+    @JsonProperty("description_entities") List<MessageEntity> descriptionEntities
 ) implements BotApiObject {
     
     /**

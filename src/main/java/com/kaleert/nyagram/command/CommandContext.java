@@ -4,9 +4,11 @@ import com.kaleert.nyagram.api.methods.send.SendMessage;
 import com.kaleert.nyagram.api.methods.updatingmessages.DeleteMessage;
 import com.kaleert.nyagram.api.objects.Update;
 import com.kaleert.nyagram.api.objects.User;
+import com.kaleert.nyagram.api.objects.media.InputMedia;
 import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.api.objects.message.MaybeInaccessibleMessage;
 import com.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
+import com.kaleert.nyagram.api.objects.replykeyboard.InlineKeyboardMarkup;
 import com.kaleert.nyagram.client.NyagramClient;
 import com.kaleert.nyagram.i18n.LocaleService;
 import com.kaleert.nyagram.i18n.LocaleResolver;
@@ -56,7 +58,6 @@ public class CommandContext {
         this.localeResolver = localeResolver;
     }
 
-    // Для обратной совместимости
     public CommandContext(Update update, NyagramClient client) {
         this(update, client, null, null);
     }
@@ -345,7 +346,8 @@ public class CommandContext {
     }
 
     /**
-     * Быстрое редактирование текста текущего сообщения (из CallbackQuery).
+     * Быстрое редактирование текста (или подписи, если это медиа) текущего сообщения.
+     * Автоматически определяет тип сообщения (Text или Caption) и вызывает нужный метод API.
      *
      * @param text Текст сообщения.
      * @param replyMarkup Клавиатура, отправленная вместе с сообщением.
@@ -357,17 +359,64 @@ public class CommandContext {
             return CompletableFuture.failedFuture(new IllegalStateException("Not a callback query"));
         }
         Integer msgId = update.getCallbackQuery().getMessage().messageId().intValue();
-        return client.executeAsync(com.kaleert.nyagram.api.methods.updatingmessages.EditMessageText.builder()
-                .chatId(getChatId().toString())
-                .messageId(msgId)
-                .text(text)
-                .parseMode("HTML")
-                .replyMarkup((com.kaleert.nyagram.api.objects.replykeyboard.InlineKeyboardMarkup) replyMarkup)
-                .build());
+        Long chatId;
+        try { chatId = getChatId(); } catch (Exception e) { return CompletableFuture.failedFuture(e); }
+        
+        com.kaleert.nyagram.api.objects.message.MaybeInaccessibleMessage maybeMsg = update.getCallbackQuery().getMessage();
+        boolean hasMedia = false;
+        if (maybeMsg instanceof com.kaleert.nyagram.api.objects.message.Message msg) {
+            hasMedia = msg.hasMedia();
+        }
+
+        if (hasMedia) {
+            return client.executeAsync(com.kaleert.nyagram.api.methods.updatingmessages.EditMessageCaption.builder()
+                    .chatId(chatId.toString())
+                    .messageId(msgId)
+                    .caption(text)
+                    .parseMode("HTML")
+                    .replyMarkup((InlineKeyboardMarkup) replyMarkup)
+                    .build());
+        } else {
+            return client.executeAsync(com.kaleert.nyagram.api.methods.updatingmessages.EditMessageText.builder()
+                    .chatId(chatId.toString())
+                    .messageId(msgId)
+                    .text(text)
+                    .parseMode("HTML")
+                    .replyMarkup((InlineKeyboardMarkup) replyMarkup)
+                    .build());
+        }
     }
 
     public CompletableFuture<Serializable> editMessage(String text) {
         return editMessage(text, null);
+    }
+    
+    /**
+     * Изменяет саму картинку или видео в текущем сообщении с кнопками.
+     *
+     * @param media Новый медиафайл (например, InputMediaPhoto).
+     * @param replyMarkup Клавиатура (опционально).
+     *
+     * @since 1.1.5
+     */
+    public CompletableFuture<Serializable> editMedia(InputMedia media, ReplyKeyboard replyMarkup) {
+        if (update.getCallbackQuery() == null || update.getCallbackQuery().getMessage() == null) {
+            return CompletableFuture.failedFuture(new IllegalStateException("Not a callback query"));
+        }
+        Integer msgId = update.getCallbackQuery().getMessage().messageId().intValue();
+        Long chatId;
+        try { chatId = getChatId(); } catch (Exception e) { return CompletableFuture.failedFuture(e); }
+
+        return client.executeAsync(com.kaleert.nyagram.api.methods.updatingmessages.EditMessageMedia.builder()
+                .chatId(chatId.toString())
+                .messageId(msgId)
+                .media(media)
+                .replyMarkup((InlineKeyboardMarkup) replyMarkup)
+                .build());
+    }
+
+    public CompletableFuture<Serializable> editMedia(InputMedia media) {
+        return editMedia(media, null);
     }
 
     /**

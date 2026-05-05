@@ -128,12 +128,10 @@ public class BroadcastManager {
                 duration, total.get(), success.get(), failed.get());
         
         eventPublisher.publishEvent(new BroadcastCompleteEvent(
-                total.get(), success.get(), failed.get(), duration
+            total.get(), success.get(), failed.get(), duration, null
         ));
     }
     
-    
-
     private void handleError(TelegramApiException e, Long chatId) {
         if (e.getErrorCode() != null && e.getErrorCode() == 403) {
             eventPublisher.publishEvent(new UserBlockedEvent(chatId));
@@ -143,8 +141,10 @@ public class BroadcastManager {
     }
 
     private void throttle(long count) {
-        if (count % 100 == 0) {
-            try { Thread.sleep(50); } catch (InterruptedException ignored) {}
+        try { 
+            Thread.sleep(40); 
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
         }
     }
     
@@ -159,8 +159,8 @@ public class BroadcastManager {
      * @since 1.1.4
      */
     public void broadcastMessage(Long fromChatId, Integer messageId, ReplyKeyboard replyMarkup, Integer senderAdminId) {
-        log.info("Starting advanced broadcast (CopyMessage) initiated by admin {}", senderAdminId);
-        new Thread(() -> runCopyBroadcastLoop(fromChatId, messageId, replyMarkup), "broadcast-manager").start();
+        log.info("Starting advanced broadcast initiated by admin {}", senderAdminId);
+        new Thread(() -> runAdvancedBroadcastLoop(fromChatId, messageId, replyMarkup, senderAdminId), "broadcast-manager").start();
     }
     /**
     * @param fromChatId Айди чата, из которого взято сообщение
@@ -171,15 +171,16 @@ public class BroadcastManager {
     *
     * @since 1.1.4
     */
-    private void runCopyBroadcastLoop(Long fromChatId, Integer messageId, ReplyKeyboard replyMarkup) {
+    @Deprecated(since = "1.1.5", forRemoval = true)
+    private void runCopyBroadcastLoop(Long fromChatId, Integer messageId, ReplyKeyboard replyMarkup, Integer senderAdminId) {
         long startTime = System.currentTimeMillis();
-        AtomicLong total = new AtomicLong();
-        AtomicLong success = new AtomicLong();
-        AtomicLong failed = new AtomicLong();
+        java.util.concurrent.atomic.AtomicLong total = new java.util.concurrent.atomic.AtomicLong();
+        java.util.concurrent.atomic.AtomicLong success = new java.util.concurrent.atomic.AtomicLong();
+        java.util.concurrent.atomic.AtomicLong failed = new java.util.concurrent.atomic.AtomicLong();
         
-        Phaser phaser = new Phaser(1); 
+        java.util.concurrent.Phaser phaser = new java.util.concurrent.Phaser(1); 
     
-        try (Stream<Long> targets = targetProvider.getTargetChatIds()) {
+        try (java.util.stream.Stream<Long> targets = targetProvider.getTargetChatIds()) {
             targets.forEach(chatId -> {
                 total.incrementAndGet();
                 phaser.register();
@@ -187,14 +188,14 @@ public class BroadcastManager {
                 try {
                     taskExecutor.execute(chatId, () -> {
                         try {
-                            client.execute(CopyMessage.builder()
+                            client.execute(com.kaleert.nyagram.api.methods.send.CopyMessage.builder()
                                     .chatId(chatId.toString())
                                     .fromChatId(fromChatId.toString())
                                     .messageId(messageId)
                                     .replyMarkup(replyMarkup)
                                     .build());
                             success.incrementAndGet();
-                        } catch (TelegramApiException e) {
+                        } catch (com.kaleert.nyagram.api.exception.TelegramApiException e) {
                             handleError(e, chatId);
                             failed.incrementAndGet();
                         } catch (Exception e) {
@@ -217,7 +218,7 @@ public class BroadcastManager {
             log.error("Error during copy broadcast iteration", e);
         }
     
-        finishBroadcast(startTime, phaser, total.get(), success.get(), failed.get());
+        finishBroadcast(startTime, phaser, total.get(), success, failed, senderAdminId);
     }
     
     /**
@@ -234,22 +235,103 @@ public class BroadcastManager {
      * @param total     Общее количество пользователей, которым пытались отправить сообщение.
      * @param success   Количество успешных отправок.
      * @param failed    Количество неудачных отправок (ошибки, блокировки).
+     * @param senderAdminId ID администратора, запустившего рассылку (для логов и событий).
      * 
      * @since 1.1.4
      */
-    private void finishBroadcast(long startTime, Phaser phaser, long total, long success, long failed) {
+    private void finishBroadcast(long startTime, Phaser phaser, long total, 
+                                java.util.concurrent.atomic.AtomicLong success, 
+                                java.util.concurrent.atomic.AtomicLong failed, 
+                                Integer senderAdminId) {
         log.info("All broadcast tasks submitted. Waiting for completion...");
-        
-        // Главный поток заявляет о своем прибытии к барьеру и ждет остальных.
-        // Так как Phaser был инициализирован с 1, это снимает блокировку главного потока 
-        // ТОЛЬКО когда все зарегистрированные воркеры вызовут arriveAndDeregister().
         phaser.arriveAndAwaitAdvance();
         
+        long s = success.get();
+        long f = failed.get();
         long duration = System.currentTimeMillis() - startTime;
-        log.info("Broadcast finished. Duration: {}ms. Total: {}, Success: {}, Failed: {}", 
-                duration, total, success, failed);
         
-        // Публикуем событие об успешном завершении для других частей приложения
-        eventPublisher.publishEvent(new BroadcastCompleteEvent(total, success, failed, duration));
+        log.info("Broadcast finished. Duration: {}ms. Total: {}, Success: {}, Failed: {}", 
+                duration, total, s, f);
+        
+        eventPublisher.publishEvent(new BroadcastCompleteEvent(total, s, f, duration, senderAdminId));
+    }
+    
+    /**
+     * Внутренний цикл продвинутой массовой рассылки сообщений.
+     * <p>
+     * Осуществляет многопоточную отправку существующего сообщения (поддерживаются любые медиаформаты).
+     * Использует гибридный механизм отправки:
+     * <ul>
+     *     <li>Если {@code replyMarkup} <b>не задан</b>, используется метод {@link com.kaleert.nyagram.api.methods.send.ForwardMessage}
+     *     для максимальной скорости и сохранения оригинального вида поста.</li>
+     *     <li>Если {@code replyMarkup} <b>задан</b>, используется метод {@link com.kaleert.nyagram.api.methods.send.CopyMessage},
+     *     позволяющий прикрепить новые кнопки к рассылаемому контенту.</li>
+     * </ul>
+     * Задачи распределяются через {@link com.kaleert.nyagram.core.concurrency.NyagramExecutor}, а ожидание завершения всех потоков 
+     * синхронизируется с помощью {@link java.util.concurrent.Phaser}.
+     * </p>
+     *
+     * @param fromChatId    ID чата (например, админской группы), из которого берется исходное сообщение.
+     * @param messageId     ID исходного сообщения для рассылки.
+     * @param replyMarkup   Новая Inline-клавиатура, которую необходимо прикрепить к копии сообщения (может быть {@code null}).
+     * @param senderAdminId ID администратора, запустившего рассылку (для логов и событий завершения).
+     *
+     * @since 1.1.5
+     */
+    private void runAdvancedBroadcastLoop(Long fromChatId, Integer messageId, ReplyKeyboard replyMarkup, Integer senderAdminId) {
+        long startTime = System.currentTimeMillis();
+        java.util.concurrent.atomic.AtomicLong total = new java.util.concurrent.atomic.AtomicLong();
+        java.util.concurrent.atomic.AtomicLong success = new java.util.concurrent.atomic.AtomicLong();
+        java.util.concurrent.atomic.AtomicLong failed = new java.util.concurrent.atomic.AtomicLong();
+        
+        java.util.concurrent.Phaser phaser = new java.util.concurrent.Phaser(1); 
+    
+        try (java.util.stream.Stream<Long> targets = targetProvider.getTargetChatIds()) {
+            targets.forEach(chatId -> {
+                total.incrementAndGet();
+                phaser.register();
+    
+                try {
+                    taskExecutor.execute(chatId, () -> {
+                        try {
+                            if (replyMarkup == null) {
+                                client.execute(com.kaleert.nyagram.api.methods.send.ForwardMessage.builder()
+                                        .chatId(chatId.toString())
+                                        .fromChatId(fromChatId.toString())
+                                        .messageId(messageId)
+                                        .build());
+                            } else {
+                                client.execute(com.kaleert.nyagram.api.methods.send.CopyMessage.builder()
+                                        .chatId(chatId.toString())
+                                        .fromChatId(fromChatId.toString())
+                                        .messageId(messageId)
+                                        .replyMarkup(replyMarkup)
+                                        .build());
+                            }
+                            success.incrementAndGet();
+                        } catch (com.kaleert.nyagram.api.exception.TelegramApiException e) {
+                            handleError(e, chatId);
+                            failed.incrementAndGet();
+                        } catch (Exception e) {
+                            log.error("Generic error sending to {}", chatId, e);
+                            failed.incrementAndGet();
+                        } finally {
+                            phaser.arriveAndDeregister();
+                        }
+                    });
+                } catch (Exception e) {
+                    phaser.arriveAndDeregister();
+                    failed.incrementAndGet();
+                    log.error("Failed to submit broadcast task for {}", chatId, e);
+                }
+    
+                throttle(total.get());
+            });
+            
+        } catch (Exception e) {
+            log.error("Error during broadcast iteration", e);
+        }
+    
+        finishBroadcast(startTime, phaser, total.get(), success, failed, senderAdminId);
     }
 }

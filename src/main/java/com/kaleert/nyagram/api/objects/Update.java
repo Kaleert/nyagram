@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import com.kaleert.nyagram.api.objects.chat.Chat;
 import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.api.objects.chatmember.ChatMember;
+import com.kaleert.nyagram.api.objects.managedbots.ManagedBotUpdated;
 
 import java.io.Serializable;
 import java.util.List;
@@ -106,6 +107,9 @@ public class Update implements Serializable {
     @JsonProperty("message_reaction_count")
     private MessageReactionCountUpdated messageReactionCount;
     
+    @JsonProperty("managed_bot")
+    private ManagedBotUpdated managedBot;
+    
     /**
      * Возвращает строковое представление типа обновления.
      *
@@ -139,6 +143,7 @@ public class Update implements Serializable {
         if (deletedBusinessMessages != null) return "deleted_business_messages";
         if (businessConnection != null) return "business_connection";
         if (messageReactionCount != null) return "message_reaction_count";
+        if (managedBot != null) return "managed_bot";
 
         return "unknown";
     }
@@ -200,6 +205,7 @@ public class Update implements Serializable {
         if (purchasedPaidMedia != null) return purchasedPaidMedia.getFrom().getId();
         if (businessMessage != null && businessMessage.getFrom() != null) return businessMessage.getFrom().getId();
         if (businessConnection != null) return businessConnection.getUser().getId();
+        if (managedBot != null && managedBot.user() != null) return managedBot.user().getId();
 
         return null;
     }
@@ -227,6 +233,7 @@ public class Update implements Serializable {
         if (purchasedPaidMedia != null) return purchasedPaidMedia.getFrom();
         if (businessMessage != null && businessMessage.getFrom() != null) return businessMessage.getFrom();
         if (businessConnection != null) return businessConnection.getUser();
+        if (managedBot != null) return managedBot.user();
         return null;
     }
     
@@ -323,6 +330,8 @@ public class Update implements Serializable {
      * @return true, если это message_reaction.
      */
     public boolean hasMessageReaction() { return messageReaction != null; }
+    
+    public boolean hasManagedBot() { return managedBot != null; }
     
     /**
      * Описывает подключение бота к бизнес-аккаунту.

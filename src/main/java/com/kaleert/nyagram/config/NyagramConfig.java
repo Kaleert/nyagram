@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.kaleert.nyagram.client.proxy.DynamicProxyClientHttpRequestFactory;
+import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
+import com.kaleert.nyagram.client.proxy.ProxyAuthenticator;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -81,18 +85,26 @@ public class NyagramConfig {
      *
      * @param config Конфигурация бота.
      * @param mapper ObjectMapper.
+     * @param proxyProvider Объект провайдера ObjectProvider<NyagramProxyProvider>
      * @return готовый к использованию RestClient.
      */
     @Bean
-    public RestClient telegramRestClient(NyagramBotConfig config, ObjectMapper mapper) {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    public RestClient telegramRestClient(NyagramBotConfig config, ObjectMapper mapper, ObjectProvider<NyagramProxyProvider> proxyProvider) {
+        SimpleClientHttpRequestFactory factory;
+        if (proxyProvider.getIfAvailable() != null) {
+            ProxyAuthenticator.init();
+            factory = new DynamicProxyClientHttpRequestFactory();
+        } else {
+            factory = new SimpleClientHttpRequestFactory();
+        }
+        
         factory.setConnectTimeout((int) Duration.ofSeconds(10).toMillis());
         factory.setReadTimeout((int) Duration.ofSeconds(config.getLongPollingTimeoutSeconds() + 20).toMillis());
 
         return RestClient.builder()
                 .baseUrl(config.getApiUrl())
                 .requestFactory(factory)
-                .defaultHeader("User-Agent", "NyaGram/1.0 (Spring Boot)")
+                .defaultHeader("User-Agent", "NyaGram/1.1.5 (Spring Boot)")
                 .build();
     }
     
@@ -125,11 +137,18 @@ public class NyagramConfig {
      * </p>
      *
      * @param config Конфигурация бота.
+     * @param proxyProvider Объект провайдера ObjectProvider<NyagramProxyProvider>
      * @return настроенный RestTemplate.
      */
     @Bean
-    public RestTemplate restTemplate(NyagramBotConfig config) {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+    public RestTemplate restTemplate(NyagramBotConfig config, ObjectProvider<NyagramProxyProvider> proxyProvider) {
+        SimpleClientHttpRequestFactory factory;
+        if (proxyProvider.getIfAvailable() != null) {
+            ProxyAuthenticator.init();
+            factory = new DynamicProxyClientHttpRequestFactory();
+        } else {
+            factory = new SimpleClientHttpRequestFactory();
+        }
         factory.setConnectTimeout((int) Duration.ofSeconds(10).toMillis());
         factory.setReadTimeout((int) Duration.ofSeconds(config.getLongPollingTimeoutSeconds() + 10).toMillis());
         return new RestTemplate(factory);

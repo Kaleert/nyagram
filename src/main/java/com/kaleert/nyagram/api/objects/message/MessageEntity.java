@@ -96,6 +96,18 @@ public record MessageEntity(
     /** Тип сущности: отформатированная дата и время. */
     public static final String DATE_TIME = "date_time";
     
+    /** Тип сущности: отформатированная дата . */
+    public static final String FORMATTED_DATE = "formatted_date";
+    
+    /** Тип сущности: вставленный текст . */
+    public static final String DIFF_INSERT = "diff_insert";
+    
+    /** Тип сущности: замененный текст . */
+    public static final String DIFF_REPLACE = "diff_replace";
+    
+    /** Тип сущности: удаленный текст . */
+    public static final String DIFF_DELETE = "diff_delete";
+    
     /**
      * Извлекает текст сущности из полного текста сообщения.
      * @param fullText Полный текст сообщения.

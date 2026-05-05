@@ -41,7 +41,8 @@ public record User(
     @JsonProperty("can_connect_to_business") Boolean canConnectToBusiness,
     @JsonProperty("has_main_web_app") Boolean hasMainWebApp,
     @JsonProperty("has_topics_enabled") Boolean hasTopicsEnabled,
-    @JsonProperty("allows_users_to_create_topics") Boolean allowsUsersToCreateTopics
+    @JsonProperty("allows_users_to_create_topics") Boolean allowsUsersToCreateTopics,
+    @JsonProperty("can_manage_bots") Boolean canManageBots
 ) implements BotApiObject {
     
     /**
@@ -132,6 +133,7 @@ public record User(
 
     public Boolean getHasTopicsEnabled() { return hasTopicsEnabled; }
     public Boolean getAllowsUsersToCreateTopics() { return allowsUsersToCreateTopics; }
+    public Boolean getCanManageBots() { return canManageBots; }
     
     /**
      * Возвращает полное имя пользователя (Имя + Фамилия).

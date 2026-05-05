@@ -39,6 +39,9 @@ public class MessageUtils {
                message.getMigrateFromChatId() != null ||
                message.getVideoChatStarted() != null ||
                message.getVideoChatEnded() != null ||
-               message.getVideoChatScheduled() != null;
+               message.getVideoChatScheduled() != null ||
+               message.getManagedBotCreated() != null ||
+               message.getPollOptionAdded() != null ||
+               message.getPollOptionDeleted() != null;
     }
 }

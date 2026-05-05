@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaleert.nyagram.api.exception.TelegramApiRequestException;
 import com.kaleert.nyagram.api.exception.TelegramApiValidationException;
 import com.kaleert.nyagram.api.meta.BotApiMethod;
+import com.kaleert.nyagram.api.objects.ReplyParameters;
 import com.kaleert.nyagram.api.objects.message.Message;
+import com.kaleert.nyagram.api.objects.message.MessageEntity;
 import com.kaleert.nyagram.api.objects.polls.InputPollOption;
 import com.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
 import lombok.*;
@@ -111,7 +113,29 @@ public class SendPoll extends BotApiMethod<Message> {
      */
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
+    
+    /**
+     * Если сообщение является ответом, ID исходного сообщения.
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
+    @JsonProperty("reply_to_message_id")
+    private Integer replyToMessageId;
 
+    /**
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
+    @JsonProperty("allow_sending_without_reply")
+    private Boolean allowSendingWithoutReply;
+    
+    /**
+     * Параметры ответа. Заменяет reply_to_message_id.
+     * Необходим для ответов на варианты опросов (API 9.6).
+     */
+    @JsonProperty("reply_parameters")
+    private ReplyParameters replyParameters;
+    
     /** Идентификатор эффекта сообщения (например, ID анимации огня или сердечек). */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
@@ -119,7 +143,28 @@ public class SendPoll extends BotApiMethod<Message> {
     /** Идентификатор бизнес-соединения. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    @JsonProperty("allows_revoting")
+    private Boolean allowsRevoting;
 
+    @JsonProperty("shuffle_options")
+    private Boolean shuffleOptions;
+
+    @JsonProperty("allow_adding_options")
+    private Boolean allowAddingOptions;
+
+    @JsonProperty("hide_results_until_closes")
+    private Boolean hideResultsUntilCloses;
+
+    @JsonProperty("description")
+    private String description;
+
+    @JsonProperty("description_parse_mode")
+    private String descriptionParseMode;
+
+    @JsonProperty("description_entities")
+    private List<MessageEntity> descriptionEntities;
+    
     @Override
     public String getMethod() {
         return PATH;

@@ -3,7 +3,10 @@ package com.kaleert.nyagram.core.polling;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaleert.nyagram.api.dto.UpdateResponse;
 import com.kaleert.nyagram.api.objects.Update;
-import com.kaleert.nyagram.core.UpdateProcessor; // <-- Внедряем Processor
+import com.kaleert.nyagram.core.UpdateProcessor;
+import com.kaleert.nyagram.client.proxy.NyagramProxy;
+import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
+import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
 import com.kaleert.nyagram.core.spi.BotStateRepository;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.ObjectProvider;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -44,14 +48,13 @@ public class NyagramPoller {
 
     private final NyagramBotConfig botConfig;
     private final BotStateRepository stateRepository;
-    private final UpdateProcessor updateProcessor; // <-- Используем вместо Dispatcher и Executor
+    private final UpdateProcessor updateProcessor;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final ObjectProvider<NyagramProxyProvider> proxyProvider;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private ExecutorService pollerExecutor;
-    
-    private static final String BASE_URL_FORMAT = "https://api.telegram.org/bot%s/getUpdates?timeout=%d&offset=%d";
     
     /** Аварийная задержка, если конфиг сломан **/
     private static final int EMERGENCY_FALLBACK_DELAY = 3;
@@ -129,8 +132,21 @@ public class NyagramPoller {
         log.info("Nyagram Poller started. Offset: {}", offset);
 
         while (isRunning.get() && !Thread.currentThread().isInterrupted()) {
+            
+            NyagramProxy currentProxy = null;
+            if (proxyProvider.getIfAvailable() != null) {
+                currentProxy = proxyProvider.getIfAvailable().getProxy();
+                ProxyContextHolder.set(currentProxy);
+            }
+            
             try {
-                String urlStr = String.format(BASE_URL_FORMAT,
+                String apiUrl = botConfig.getApiUrl();
+                if (apiUrl.endsWith("/")) {
+                    apiUrl = apiUrl.substring(0, apiUrl.length() - 1);
+                }
+                
+                String urlStr = String.format("%s/bot%s/getUpdates?timeout=%d&offset=%d",
+                        apiUrl,
                         safeToken,
                         50, 
                         offset
@@ -171,6 +187,9 @@ public class NyagramPoller {
                 }
 
             } catch (ResourceAccessException e) {
+                if (proxyProvider.getIfAvailable() != null && currentProxy != null) {
+                    proxyProvider.getIfAvailable().onProxyError(currentProxy, e);
+                }
                 log.warn("Network timeout. Retrying...");
             } catch (HttpClientErrorException e) {
                 if (e.getStatusCode().value() == 404) {
@@ -188,6 +207,8 @@ public class NyagramPoller {
             } catch (Exception e) {
                 log.error("Critical Poller Error", e);
                 ensureSafeDelay();
+            } finally {
+                ProxyContextHolder.clear();
             }
         }
     }

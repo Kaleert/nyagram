@@ -41,7 +41,7 @@ public class FsmMiddleware implements Middleware {
         Long userId = context.getUserId();
         UserSession session = sessionManager.getSession(userId);
 
-        if (session == null || session.getState() == null) {
+        if (session == null || session.getState() == null || !session.getChatId().equals(context.getChatId())) {
             return next.proceed();
         }
 

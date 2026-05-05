@@ -57,7 +57,6 @@ public class RedisBotStateRepository implements BotStateRepository {
                 TimeUnit.SECONDS
             );
             
-            // Периодическое логирование
             if (updateId % 1000 == 0) {
                 log.debug("Saved updateId {} to Redis (TTL: {} days)", updateId, TTL.toDays());
             }

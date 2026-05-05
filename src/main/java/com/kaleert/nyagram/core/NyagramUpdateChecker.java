@@ -3,9 +3,15 @@ package com.kaleert.nyagram.core;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaleert.nyagram.config.NyagramProperties;
+import com.kaleert.nyagram.client.proxy.DynamicProxyClientHttpRequestFactory;
+import com.kaleert.nyagram.client.proxy.NyagramProxy;
+import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
+import com.kaleert.nyagram.client.proxy.ProxyAuthenticator;
+import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -20,15 +26,31 @@ public class NyagramUpdateChecker {
 
     private final ObjectMapper mapper;
     private final NyagramProperties properties;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectProvider<NyagramProxyProvider> proxyProvider;
+    private RestTemplate restTemplate;
     
     private static final String GITHUB_PACKAGE_URL = "https://raw.githubusercontent.com/Kaleert/nyagram/master/package.json";
 
     @PostConstruct
+    public void init() {
+        if (proxyProvider.getIfAvailable() != null) {
+            ProxyAuthenticator.init();
+            this.restTemplate = new RestTemplate(new DynamicProxyClientHttpRequestFactory());
+        } else {
+            this.restTemplate = new RestTemplate();
+        }
+        checkForUpdates();
+    }
+
     public void checkForUpdates() {
         Thread checkerThread = new Thread(() -> {
+            NyagramProxy currentProxy = null;
+            if (proxyProvider.getIfAvailable() != null) {
+                currentProxy = proxyProvider.getIfAvailable().getProxy();
+                ProxyContextHolder.set(currentProxy);
+            }
+            
             try {
-                // 1. Читаем локальную версию из ресурсов (куда ее положил Gradle)
                 InputStream is = getClass().getClassLoader().getResourceAsStream("package.json");
                 if (is == null) return;
                 
@@ -38,7 +60,6 @@ public class NyagramUpdateChecker {
 
                 log.info("😺 Nyagram Framework v{} (Telegram Bot API {})", localVersion, apiVersion);
 
-                // 2. Запрашиваем удаленную версию с GitHub
                 String remoteJson = restTemplate.getForObject(GITHUB_PACKAGE_URL, String.class);
                 if (remoteJson == null) return;
 
@@ -46,16 +67,17 @@ public class NyagramUpdateChecker {
                 String remoteVersion = remotePkg.get("version").asText();
                 String docsUrl = remotePkg.has("docsUrl") ? remotePkg.get("docsUrl").asText() : "https://nyagram.kaleert.pro";
 
-                // 3. Сравниваем версии
                 if (isNewerVersion(localVersion, remoteVersion)) {
                     log.warn("=========================================================");
-                    log.warn("✨ Доступна новая версия Nyagram: {} (Ваша версия: {})", remoteVersion, localVersion);
+                    log.warn("✨ New Nyagram version available: {} (Your: {})", remoteVersion, localVersion);
                     log.warn("👉 Changelog: {}/version/{}", docsUrl, remoteVersion);
                     log.warn("=========================================================");
                 }
 
             } catch (Exception e) {
                 log.debug("Failed to check for Nyagram updates: {}", e.getMessage());
+            } finally {
+                ProxyContextHolder.clear();
             }
         }, "nyagram-update-checker");
         

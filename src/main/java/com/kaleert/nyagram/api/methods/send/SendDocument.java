@@ -11,6 +11,7 @@ import com.kaleert.nyagram.api.methods.ParseMode;
 import com.kaleert.nyagram.api.objects.InputFile;
 import com.kaleert.nyagram.api.objects.message.MessageEntity;
 import com.kaleert.nyagram.api.objects.message.Message;
+import com.kaleert.nyagram.api.objects.ReplyParameters;
 import com.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
 import lombok.*;
 
@@ -101,14 +102,27 @@ public class SendDocument extends BotApiMethod<Message> implements MultipartRequ
     /**
      * ID сообщения для ответа.
      */
+    /**
+     * Если сообщение является ответом, ID исходного сообщения.
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
     @JsonProperty("reply_to_message_id")
     private Integer replyToMessageId;
 
     /**
-     * Разрешить отправку без ответа.
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
+    @Deprecated(since = "1.1.5")
     @JsonProperty("allow_sending_without_reply")
     private Boolean allowSendingWithoutReply;
+    
+    /**
+     * Параметры ответа. Заменяет reply_to_message_id.
+     * Необходим для ответов на варианты опросов (API 9.6).
+     */
+    @JsonProperty("reply_parameters")
+    private ReplyParameters replyParameters;
 
     /**
      * Клавиатура.

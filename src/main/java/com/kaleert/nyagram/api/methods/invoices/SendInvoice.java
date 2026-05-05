@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kaleert.nyagram.api.exception.TelegramApiRequestException;
 import com.kaleert.nyagram.api.exception.TelegramApiValidationException;
 import com.kaleert.nyagram.api.meta.BotApiMethod;
+import com.kaleert.nyagram.api.objects.ReplyParameters;
 import com.kaleert.nyagram.api.objects.message.Message;
 import com.kaleert.nyagram.api.objects.payments.LabeledPrice;
 import com.kaleert.nyagram.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -98,7 +99,29 @@ public class SendInvoice extends BotApiMethod<Message> {
 
     @JsonProperty("message_effect_id")
     private String messageEffectId;
+    
+    /**
+     * Если сообщение является ответом, ID исходного сообщения.
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
+    @JsonProperty("reply_to_message_id")
+    private Integer replyToMessageId;
 
+    /**
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
+    @JsonProperty("allow_sending_without_reply")
+    private Boolean allowSendingWithoutReply;
+    
+    /**
+     * Параметры ответа. Заменяет reply_to_message_id.
+     * Необходим для ответов на варианты опросов (API 9.6).
+     */
+    @JsonProperty("reply_parameters")
+    private ReplyParameters replyParameters;
+    
     /** Идентификатор бизнес-соединения. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;

@@ -1,8 +1,8 @@
 {
   "name": "nyagram",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Modern Java Telegram Bot Framework based on Spring Boot 3",
-  "telegramApiVersion": "9.5",
+  "telegramApiVersion": "9.6",
   "docsUrl": "https://nyagram.kaleert.pro",
   "author": "Kaleert",
   "repository": "https://github.com/Kaleert/nyagram",

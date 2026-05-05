@@ -1,9 +1,16 @@
 package com.kaleert.nyagram.feature.files;
 
 import com.kaleert.nyagram.client.NyagramClient;
+import com.kaleert.nyagram.client.proxy.DynamicProxyClientHttpRequestFactory;
+import com.kaleert.nyagram.client.proxy.NyagramProxy;
+import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
+import com.kaleert.nyagram.client.proxy.ProxyAuthenticator;
+import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -29,8 +36,20 @@ public class FileService {
 
     private final NyagramClient client;
     private final NyagramBotConfig config;
-    private final RestClient rawClient = RestClient.builder().build(); 
+    private final ObjectProvider<NyagramProxyProvider> proxyProvider;
     
+    private RestClient rawClient;
+
+    @PostConstruct
+    public void init() {
+        RestClient.Builder builder = RestClient.builder();
+        if (proxyProvider.getIfAvailable() != null) {
+            ProxyAuthenticator.init();
+            builder.requestFactory(new DynamicProxyClientHttpRequestFactory());
+        }
+        this.rawClient = builder.build();
+    }
+
     /**
      * Асинхронно скачивает файл по его ID и сохраняет в указанное место.
      *
@@ -52,9 +71,15 @@ public class FileService {
      * @throws RuntimeException если скачивание не удалось.
      */
     public Path downloadContent(String telegramFilePath, Path destination) {
-        String url = String.format("https://api.telegram.org/file/bot%s/%s", 
-                config.getBotToken(), telegramFilePath);
+        String url = String.format("%s/file/bot%s/%s", 
+                config.getApiUrl(), config.getBotToken(), telegramFilePath);
         
+        NyagramProxy currentProxy = null;
+        if (proxyProvider.getIfAvailable() != null) {
+            currentProxy = proxyProvider.getIfAvailable().getProxy();
+            ProxyContextHolder.set(currentProxy);
+        }
+
         try {
             byte[] body = rawClient.get()
                     .uri(url)
@@ -71,8 +96,13 @@ public class FileService {
             return destination;
 
         } catch (Exception e) {
+            if (proxyProvider.getIfAvailable() != null && currentProxy != null) {
+                proxyProvider.getIfAvailable().onProxyError(currentProxy, e);
+            }
             log.error("Failed to download file {}", telegramFilePath, e);
             throw new RuntimeException("Download failed", e);
+        } finally {
+            ProxyContextHolder.clear();
         }
     }
 }

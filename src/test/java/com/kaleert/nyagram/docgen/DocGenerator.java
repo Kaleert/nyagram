@@ -49,7 +49,6 @@ public class DocGenerator {
         try {
             File pkgFile = new File("package.json");
             if (pkgFile.exists()) {
-                // Создаем чистый маппер специально для JSON
                 com.fasterxml.jackson.databind.JsonNode node = new ObjectMapper().readTree(pkgFile);
                 projectVersion = node.get("version").asText();
                 node.get("telegramApiVersion").asText();
@@ -96,7 +95,6 @@ public class DocGenerator {
         
         System.out.println("\n✅ Файл сохранен: " + outFile.getAbsolutePath());
         
-        // --- ВЫВОД СТАТИСТИКИ ---
         printFinalStats();
         printChecklist();
     }
@@ -117,7 +115,6 @@ public class DocGenerator {
         System.out.printf("   Готово:           %d\n", done);
         System.out.printf("   Нужно сделать:    %d\n", missing);
         
-        // Рисуем прогресс бар
         int barLength = 30;
         int filledLength = (int) (percent / 100 * barLength);
         String bar = "█".repeat(filledLength) + "░".repeat(barLength - filledLength);
@@ -349,8 +346,6 @@ public class DocGenerator {
 
         return new DeprecationDoc(true, since, forRemoval, reason);
     } 
-    
-    // --- GAP HELPERS ---
 
     private record Gap(String type, String location, String todo, int weight) {}
 
@@ -366,13 +361,11 @@ public class DocGenerator {
     private static int calculateWeight(String pkg, String type) {
         int score = 0;
         
-        // Приоритетные пакеты
         if (pkg.contains("api.methods") || pkg.contains("api.objects")) score += 100;
         else if (pkg.contains("command")) score += 90;
         else if (pkg.contains("client")) score += 80;
         else score += 10;
 
-        // Приоритетные типы элементов
         switch (type) {
             case "CLASS" -> score += 50;
             case "METHOD" -> score += 30;
@@ -381,8 +374,6 @@ public class DocGenerator {
         }
         return score;
     }
-
-    // --- PARSING HELPERS (CLEANUP) ---
 
     private static String javadocToMarkdown(String javadoc) {
         if (javadoc == null || javadoc.isBlank()) return "";
@@ -492,7 +483,6 @@ public class DocGenerator {
         return "Type";
     }
 
-    // DTOs
     public record DeprecationDoc(boolean isDeprecated, String since, boolean forRemoval, String description) {}
     public record ApiRoot(String version, List<PackageDoc> packages) {}
     public record PackageDoc(String name, List<ClassDoc> items) {}

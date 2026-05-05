@@ -13,6 +13,7 @@ import com.kaleert.nyagram.core.polling.NyagramPoller;
 import com.kaleert.nyagram.core.spi.BotStateRepository;
 import com.kaleert.nyagram.core.spi.MissingArgumentHandler;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
+import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
 import com.kaleert.nyagram.feature.broadcast.spi.BroadcastTargetProvider;
 import com.kaleert.nyagram.feature.forum.impl.InMemoryTopicIdCache;
 import com.kaleert.nyagram.feature.forum.spi.TopicIdCache;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -107,9 +109,10 @@ public class NyagramAutoConfiguration {
             NyagramBotConfig botConfig, 
             NyagramExecutor taskExecutor,
             AdvancedMultipartBuilder multipartBuilder,
-            ExponentialBackoffStrategy backoffStrategy
+            ExponentialBackoffStrategy backoffStrategy,
+            ObjectProvider<NyagramProxyProvider> proxyProvider
     ) {
-        return new NyagramClient(botConfig, objectMapper, multipartBuilder, taskExecutor, backoffStrategy);
+        return new NyagramClient(botConfig, objectMapper, multipartBuilder, taskExecutor, backoffStrategy, proxyProvider);
     }
     
     /**
@@ -143,10 +146,11 @@ public class NyagramAutoConfiguration {
             BotStateRepository stateRepository,
             UpdateProcessor updateProcessor,
             RestTemplate restTemplate,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            ObjectProvider<NyagramProxyProvider> proxyProvider) {
         
         log.info("Initializing Nyagram in POLLING mode");
-        return new NyagramPoller(botConfig, stateRepository, updateProcessor, restTemplate, objectMapper);
+        return new NyagramPoller(botConfig, stateRepository, updateProcessor, restTemplate, objectMapper, proxyProvider);
     }
     
     /**

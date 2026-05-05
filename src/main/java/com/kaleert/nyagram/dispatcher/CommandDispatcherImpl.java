@@ -3,6 +3,7 @@ package com.kaleert.nyagram.dispatcher;
 import com.kaleert.nyagram.client.NyagramClient;
 import com.kaleert.nyagram.core.ArgumentResolver;
 import com.kaleert.nyagram.command.CommandContext;
+import com.kaleert.nyagram.command.Flag;
 import com.kaleert.nyagram.core.CommandResult;
 import com.kaleert.nyagram.core.concurrency.NyagramExecutor;
 import com.kaleert.nyagram.core.registry.CommandRegistry;
@@ -252,7 +253,6 @@ public class CommandDispatcherImpl implements CommandDispatcher {
 
             Object invocationResult;
             if (meta == fallbackMeta) {
-                // Прямой вызов для обычных сообщений, минуя парсинг аргументов
                 invocationResult = fallbackHandler(context);
             } else {
                 Object[] args = resolveArguments(meta, context.getText(), context);
@@ -293,13 +293,40 @@ public class CommandDispatcherImpl implements CommandDispatcher {
                 ? fullText.substring(commandPath.length()).trim()
                 : "";
 
-        Queue<String> tokens = new ArrayDeque<>(CommandTokenizer.tokenize(argsString));
-
+        List<String> rawTokens = CommandTokenizer.tokenize(argsString);
         List<Parameter> parameters = meta.getMethodParameters();
+        
+        boolean[] flagValues = new boolean[parameters.size()];
+        for (int i = 0; i < parameters.size(); i++) {
+            Parameter param = parameters.get(i);
+            Flag flagAnn = param.getAnnotation(Flag.class);
+            if (flagAnn != null) {
+                String flagName = flagAnn.value();
+                String dashFlag = "-" + flagName;
+                String doubleDashFlag = "--" + flagName;
+                
+                boolean found = false;
+                for (int j = 0; j < rawTokens.size(); j++) {
+                    if (rawTokens.get(j).equals(dashFlag) || rawTokens.get(j).equals(doubleDashFlag)) {
+                        found = true;
+                        rawTokens.remove(j);
+                        break;
+                    }
+                }
+                flagValues[i] = found;
+            }
+        }
+
+        Queue<String> tokens = new ArrayDeque<>(rawTokens);
         Object[] invokeArgs = new Object[parameters.size()];
 
         for (int i = 0; i < parameters.size(); i++) {
             Parameter param = parameters.get(i);
+
+            if (param.isAnnotationPresent(Flag.class)) {
+                invokeArgs[i] = flagValues[i];
+                continue;
+            }
 
             if (param.isVarArgs()) {
                 invokeArgs[i] = resolveVarArgs(param, tokens, context);
@@ -350,9 +377,15 @@ public class CommandDispatcherImpl implements CommandDispatcher {
     
     private boolean isLastTokenConsumingParam(List<Parameter> parameters, int currentIndex) {
         for (int i = currentIndex + 1; i < parameters.size(); i++) {
-            Class<?> type = parameters.get(i).getType();
-            ArgumentResolver<?> resolver = findResolver(type);
-            if (resolver.isTokenRequired() && !parameters.get(i).isVarArgs()) {
+            Parameter p = parameters.get(i);
+            if (p.isAnnotationPresent(Flag.class)) {
+                continue;
+            }
+            if (p.isVarArgs()) {
+                return false;
+            }
+            ArgumentResolver<?> resolver = findResolver(p.getType());
+            if (resolver.isTokenRequired()) {
                 return false;
             }
         }

@@ -30,8 +30,11 @@ import com.kaleert.nyagram.api.objects.giveaway.Giveaway;
 import com.kaleert.nyagram.api.objects.giveaway.GiveawayWinners;
 import com.kaleert.nyagram.api.objects.passport.PassportData;
 import com.kaleert.nyagram.api.objects.message.origin.MessageOrigin;
+import com.kaleert.nyagram.api.objects.managedbots.ManagedBotCreated;
 import com.kaleert.nyagram.api.objects.webapp.WebAppData;
 import com.kaleert.nyagram.api.objects.replykeyboard.InlineKeyboardMarkup;
+import com.kaleert.nyagram.api.objects.polls.PollOptionAdded;
+import com.kaleert.nyagram.api.objects.polls.PollOptionDeleted;
 
 import lombok.Builder;
 import java.util.Collections;
@@ -290,7 +293,12 @@ public record Message(
     @JsonProperty("is_direct_message") Boolean isDirectMessage,
     
     /** True, если это предложенный пост (Suggested Post). */
-    @JsonProperty("is_suggested") Boolean isSuggested
+    @JsonProperty("is_suggested") Boolean isSuggested,
+    
+    @JsonProperty("managed_bot_created") ManagedBotCreated managedBotCreated,
+    @JsonProperty("poll_option_added") PollOptionAdded pollOptionAdded,
+    @JsonProperty("poll_option_deleted") PollOptionDeleted pollOptionDeleted,
+    @JsonProperty("reply_to_poll_option_id") String replyToPollOptionId
 ) implements MaybeInaccessibleMessage {
 
     // --- Getters ---
@@ -884,6 +892,10 @@ public record Message(
     public com.kaleert.nyagram.api.objects.payments.RefundedPayment getRefundedPayment() { return refundedPayment; }
     public Boolean getIsDirectMessage() { return isDirectMessage; }
     public Boolean getIsSuggested() { return isSuggested; }
+    public ManagedBotCreated getManagedBotCreated() { return managedBotCreated; }
+    public PollOptionAdded getPollOptionAdded() { return pollOptionAdded; }
+    public PollOptionDeleted getPollOptionDeleted() { return pollOptionDeleted; }
+    public String getReplyToPollOptionId() { return replyToPollOptionId; }
 
     @JsonIgnore
     public boolean hasPaidMedia() { return paidMedia != null; }
@@ -1193,7 +1205,8 @@ public record Message(
                videoChatParticipantsInvited != null || messageAutoDeleteTimerChanged != null ||
                successfulPayment != null || giveawayCreated != null ||
                giveaway != null || giveawayWinners != null || giveawayCompleted != null ||
-               boostAdded != null || refundedPayment != null;
+               boostAdded != null || refundedPayment != null ||
+               managedBotCreated != null || pollOptionAdded != null || pollOptionDeleted != null;
     }
     
     /**
