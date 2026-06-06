@@ -54,6 +54,14 @@ public class ForwardMessage extends BotApiMethod<Message> {
      * Защитить контент от сохранения.
      */
     @JsonProperty("protect_content") private Boolean protectContent;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override public String getMethod() { return PATH; }
 
@@ -83,5 +91,15 @@ public class ForwardMessage extends BotApiMethod<Message> {
                 .fromChatId(fromChatId.toString())
                 .messageId(messageId)
                 .build();
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public ForwardMessage paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

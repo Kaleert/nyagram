@@ -48,7 +48,11 @@ public record Poll(
     @JsonProperty("close_date") Integer closeDate,
     @JsonProperty("allows_revoting") Boolean allowsRevoting,
     @JsonProperty("description") String description,
-    @JsonProperty("description_entities") List<MessageEntity> descriptionEntities
+    @JsonProperty("description_entities") List<MessageEntity> descriptionEntities,
+    @JsonProperty("media") PollMedia media,
+    @JsonProperty("explanation_media") PollMedia explanationMedia,
+    @JsonProperty("members_only") Boolean membersOnly,
+    @JsonProperty("country_codes") List<String> countryCodes
 ) implements BotApiObject {
     
     /**

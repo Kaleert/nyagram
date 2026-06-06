@@ -22,6 +22,7 @@ import com.kaleert.nyagram.security.spi.UserPermissionProvider;
 import com.kaleert.nyagram.webhook.NyagramWebhookController;
 import com.kaleert.nyagram.webhook.WebhookLifecycleService;
 import com.kaleert.nyagram.i18n.LocaleResolver;
+import com.kaleert.nyagram.core.spi.BaseUrlController;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -110,9 +111,10 @@ public class NyagramAutoConfiguration {
             NyagramExecutor taskExecutor,
             AdvancedMultipartBuilder multipartBuilder,
             ExponentialBackoffStrategy backoffStrategy,
-            ObjectProvider<NyagramProxyProvider> proxyProvider
+            ObjectProvider<NyagramProxyProvider> proxyProvider,
+            BaseUrlController baseUrlController
     ) {
-        return new NyagramClient(botConfig, objectMapper, multipartBuilder, taskExecutor, backoffStrategy, proxyProvider);
+        return new NyagramClient(botConfig, objectMapper, multipartBuilder, taskExecutor, backoffStrategy, proxyProvider, baseUrlController);
     }
     
     /**
@@ -147,10 +149,11 @@ public class NyagramAutoConfiguration {
             UpdateProcessor updateProcessor,
             RestTemplate restTemplate,
             ObjectMapper objectMapper,
-            ObjectProvider<NyagramProxyProvider> proxyProvider) {
+            ObjectProvider<NyagramProxyProvider> proxyProvider,
+            BaseUrlController baseUrlController) {
         
         log.info("Initializing Nyagram in POLLING mode");
-        return new NyagramPoller(botConfig, stateRepository, updateProcessor, restTemplate, objectMapper, proxyProvider);
+        return new NyagramPoller(botConfig, stateRepository, updateProcessor, restTemplate, objectMapper, proxyProvider, baseUrlController);
     }
     
     /**

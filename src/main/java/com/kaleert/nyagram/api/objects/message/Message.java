@@ -28,6 +28,7 @@ import com.kaleert.nyagram.api.objects.system.SystemMessages.GiveawayCreated;
 import com.kaleert.nyagram.api.objects.system.SystemMessages.GiveawayCompleted;
 import com.kaleert.nyagram.api.objects.giveaway.Giveaway;
 import com.kaleert.nyagram.api.objects.giveaway.GiveawayWinners;
+import com.kaleert.nyagram.api.objects.gifts.GiftInfo;
 import com.kaleert.nyagram.api.objects.passport.PassportData;
 import com.kaleert.nyagram.api.objects.message.origin.MessageOrigin;
 import com.kaleert.nyagram.api.objects.managedbots.ManagedBotCreated;
@@ -298,7 +299,14 @@ public record Message(
     @JsonProperty("managed_bot_created") ManagedBotCreated managedBotCreated,
     @JsonProperty("poll_option_added") PollOptionAdded pollOptionAdded,
     @JsonProperty("poll_option_deleted") PollOptionDeleted pollOptionDeleted,
-    @JsonProperty("reply_to_poll_option_id") String replyToPollOptionId
+    @JsonProperty("reply_to_poll_option_id") String replyToPollOptionId,
+    @JsonProperty("live_photo") LivePhoto livePhoto,
+    @JsonProperty("guest_bot_caller_user") User guestBotCallerUser,
+    @JsonProperty("guest_bot_caller_chat") Chat guestBotCallerChat,
+    @JsonProperty("guest_query_id") String guestQueryId,
+    
+    /** Служебное сообщение: пользователь отправил подарок. */
+    @JsonProperty("gift") GiftInfo gift
 ) implements MaybeInaccessibleMessage {
 
     // --- Getters ---
@@ -1703,4 +1711,11 @@ public record Message(
         if (hasSticker()) return "sticker";
         return null;
     }
+    
+    /**
+    * Возвращает информацию о подарке.
+    * @return GiftInfo
+    * @since 1.2.0
+    */
+    public GiftInfo getGift() { return gift; }
 }

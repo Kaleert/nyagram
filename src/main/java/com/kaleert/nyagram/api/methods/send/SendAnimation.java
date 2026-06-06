@@ -106,6 +106,14 @@ public class SendAnimation extends BotApiMethod<Message> implements MultipartReq
 
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -155,6 +163,16 @@ public class SendAnimation extends BotApiMethod<Message> implements MultipartReq
      */
     public SendAnimation withEffect(String effectId) {
         this.messageEffectId = effectId;
+        return this;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendAnimation paidBroadcast() {
+        this.allowPaidBroadcast = true;
         return this;
     }
 }

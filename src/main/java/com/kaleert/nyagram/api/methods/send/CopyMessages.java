@@ -29,6 +29,14 @@ public class CopyMessages extends BotApiMethod<List<MessageId>> {
     @JsonProperty("disable_notification") private Boolean disableNotification;
     @JsonProperty("protect_content") private Boolean protectContent;
     @JsonProperty("remove_caption") private Boolean removeCaption;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override public String getMethod() { return PATH; }
 
@@ -43,5 +51,15 @@ public class CopyMessages extends BotApiMethod<List<MessageId>> {
         if (fromChatId == null) throw new TelegramApiValidationException("from_chat_id required", PATH);
         if (messageIds == null || messageIds.isEmpty() || messageIds.size() > 100) 
             throw new TelegramApiValidationException("message_ids must contain 1-100 elements", PATH);
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public CopyMessages paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

@@ -76,6 +76,14 @@ public class SendPaidMedia extends BotApiMethod<Message> implements MultipartReq
      * Клавиатура.
      */
     @JsonProperty("reply_markup") private ReplyKeyboard replyMarkup;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override public String getMethod() { return PATH; }
     
@@ -110,5 +118,15 @@ public class SendPaidMedia extends BotApiMethod<Message> implements MultipartReq
         this.media = processedList;
         
         return files;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendPaidMedia paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

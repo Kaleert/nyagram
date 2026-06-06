@@ -7,6 +7,7 @@ import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
 import com.kaleert.nyagram.client.proxy.ProxyAuthenticator;
 import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
+import com.kaleert.nyagram.core.spi.BaseUrlController;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class FileService {
     private final NyagramClient client;
     private final NyagramBotConfig config;
     private final ObjectProvider<NyagramProxyProvider> proxyProvider;
+    private final BaseUrlController baseUrlController;
     
     private RestClient rawClient;
 
@@ -72,7 +74,7 @@ public class FileService {
      */
     public Path downloadContent(String telegramFilePath, Path destination) {
         String url = String.format("%s/file/bot%s/%s", 
-                config.getApiUrl(), config.getBotToken(), telegramFilePath);
+                baseUrlController.getBaseUrl(), config.getBotToken(), telegramFilePath);
         
         NyagramProxy currentProxy = null;
         if (proxyProvider.getIfAvailable() != null) {

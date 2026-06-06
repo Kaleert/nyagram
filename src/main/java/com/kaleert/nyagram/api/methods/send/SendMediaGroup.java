@@ -79,6 +79,14 @@ public class SendMediaGroup extends BotApiMethod<List<Message>> implements Multi
      */
     @JsonProperty("allow_sending_without_reply")
     private Boolean allowSendingWithoutReply;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -181,5 +189,15 @@ public class SendMediaGroup extends BotApiMethod<List<Message>> implements Multi
 
         this.medias = processedList;
         return files;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendMediaGroup paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

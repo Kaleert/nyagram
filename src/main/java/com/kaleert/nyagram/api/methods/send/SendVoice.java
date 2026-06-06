@@ -132,6 +132,9 @@ public class SendVoice extends BotApiMethod<Message> implements MultipartRequest
     /** Если True, подпись будет отображаться НАД медиафайлом (по умолчанию False - под ним). */
     @JsonProperty("show_caption_above_media")
     private Boolean showCaptionAboveMedia;
+    
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -215,6 +218,16 @@ public class SendVoice extends BotApiMethod<Message> implements MultipartRequest
      */
     public SendVoice withEffect(String effectId) {
         this.messageEffectId = effectId;
+        return this;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendVoice paidBroadcast() {
+        this.allowPaidBroadcast = true;
         return this;
     }
 }

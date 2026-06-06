@@ -2,14 +2,17 @@ package com.kaleert.nyagram.middleware;
 
 import com.kaleert.nyagram.command.CommandContext;
 import com.kaleert.nyagram.meta.CommandMeta;
+import com.kaleert.nyagram.middleware.annotation.MiddlewareRoute;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Диспетчер Middleware.
@@ -27,6 +30,7 @@ public class MiddlewareDispatcher {
 
     private final List<Middleware> middlewares;
     private List<Middleware> sortedMiddlewares;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
     
     /**
      * Инициализирует диспетчер.
@@ -51,11 +55,29 @@ public class MiddlewareDispatcher {
      * @return Future с результатом выполнения цепочки (Continue, Stop или Error).
      */
     public CompletableFuture<MiddlewareResult> dispatch(CommandContext context, CommandMeta meta) {
-        if (sortedMiddlewares.isEmpty()) {
-            return new MiddlewareChain(sortedMiddlewares, context, meta).proceed();
+        List<Middleware> applicableMiddlewares = sortedMiddlewares.stream()
+                .filter(m -> isApplicable(m, meta.getFullCommandPath()))
+                .collect(Collectors.toList());
+
+        if (applicableMiddlewares.isEmpty()) {
+            return new MiddlewareChain(applicableMiddlewares, context, meta).proceed();
+        }
+
+        return new MiddlewareChain(applicableMiddlewares, context, meta).proceed();
+    }
+    
+    private boolean isApplicable(Middleware middleware, String commandPath) {
+        MiddlewareRoute route = middleware.getClass().getAnnotation(MiddlewareRoute.class);
+        if (route == null || route.value().length == 0) {
+            return true;
         }
         
-        MiddlewareChain chain = new MiddlewareChain(sortedMiddlewares, context, meta);
-        return chain.proceed();
+        String pathToCheck = commandPath != null ? commandPath : "";
+        for (String pattern : route.value()) {
+            if (pathMatcher.match(pattern, pathToCheck)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

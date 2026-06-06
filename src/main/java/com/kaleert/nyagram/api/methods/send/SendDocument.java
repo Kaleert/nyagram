@@ -141,6 +141,14 @@ public class SendDocument extends BotApiMethod<Message> implements MultipartRequ
     /** Если True, подпись будет отображаться НАД медиафайлом (по умолчанию False - под ним). */
     @JsonProperty("show_caption_above_media")
     private Boolean showCaptionAboveMedia;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -277,6 +285,16 @@ public class SendDocument extends BotApiMethod<Message> implements MultipartRequ
      */
     public SendDocument withEffect(String effectId) {
         this.messageEffectId = effectId;
+        return this;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendDocument paidBroadcast() {
+        this.allowPaidBroadcast = true;
         return this;
     }
 }

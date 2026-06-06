@@ -75,6 +75,14 @@ public class SendDice extends BotApiMethod<Message> {
 
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -89,5 +97,15 @@ public class SendDice extends BotApiMethod<Message> {
     @Override
     public void validate() throws TelegramApiValidationException {
         if (chatId == null || chatId.isEmpty()) throw new TelegramApiValidationException("ChatId is required", PATH);
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendDice paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

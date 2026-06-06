@@ -1,6 +1,7 @@
 package com.kaleert.nyagram.api.meta;
 
 import com.kaleert.nyagram.api.objects.InputFile;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Map;
 
 /**
@@ -20,5 +21,6 @@ public interface MultipartRequest {
      *
      * @return Карта, где ключ — имя поля (например, "photo"), а значение — объект {@link InputFile}.
      */
+    @JsonIgnore
     Map<String, InputFile> getFiles();
 }

@@ -42,7 +42,8 @@ public record User(
     @JsonProperty("has_main_web_app") Boolean hasMainWebApp,
     @JsonProperty("has_topics_enabled") Boolean hasTopicsEnabled,
     @JsonProperty("allows_users_to_create_topics") Boolean allowsUsersToCreateTopics,
-    @JsonProperty("can_manage_bots") Boolean canManageBots
+    @JsonProperty("can_manage_bots") Boolean canManageBots,
+    @JsonProperty("supports_guest_queries") Boolean supportsGuestQueries
 ) implements BotApiObject {
     
     /**

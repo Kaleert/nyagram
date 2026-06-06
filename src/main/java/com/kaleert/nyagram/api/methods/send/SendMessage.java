@@ -118,6 +118,14 @@ public class SendMessage extends BotApiMethod<Message> {
     /** Идентификатор бизнес-соединения. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -204,6 +212,16 @@ public class SendMessage extends BotApiMethod<Message> {
      */
     public SendMessage replyTo(Integer messageId) {
         this.replyToMessageId = messageId;
+        return this;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendMessage paidBroadcast() {
+        this.allowPaidBroadcast = true;
         return this;
     }
 }

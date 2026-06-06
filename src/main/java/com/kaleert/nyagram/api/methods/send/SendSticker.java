@@ -107,6 +107,9 @@ public class SendSticker extends BotApiMethod<Message> implements MultipartReque
     /** Идентификатор бизнес-соединения. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -186,5 +189,15 @@ public class SendSticker extends BotApiMethod<Message> implements MultipartReque
     @Override
     public Map<String, InputFile> getFiles() {
         return sticker != null ? Map.of("sticker", sticker) : Map.of();
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendSticker paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

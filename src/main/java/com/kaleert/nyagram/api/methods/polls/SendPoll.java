@@ -165,6 +165,38 @@ public class SendPoll extends BotApiMethod<Message> {
     @JsonProperty("description_entities")
     private List<MessageEntity> descriptionEntities;
     
+    /**
+    * @since 1.2.0
+    */
+    @JsonProperty("media")
+    private Object media;
+        
+    /**
+    * @since 1.2.0
+    */
+    @JsonProperty("explanation_media")
+    private Object explanationMedia;
+    
+    /**
+    * @since 1.2.0
+    */
+    @JsonProperty("members_only")
+    private Boolean membersOnly;
+    
+    /**
+    * @since 1.2.0
+    */
+    @JsonProperty("country_codes")
+    private List<String> countryCodes;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+     @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
+    
     @Override
     public String getMethod() {
         return PATH;
@@ -235,5 +267,15 @@ public class SendPoll extends BotApiMethod<Message> {
                 .question(question)
                 .type("regular")
                 .build();
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendPoll paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

@@ -13,6 +13,7 @@ import com.kaleert.nyagram.api.objects.File;
 import com.kaleert.nyagram.api.methods.GetFile;
 import com.kaleert.nyagram.client.retry.ExponentialBackoffStrategy;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
+import com.kaleert.nyagram.core.spi.BaseUrlController;
 import com.kaleert.nyagram.client.proxy.NyagramProxy;
 import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
 import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
@@ -28,6 +29,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.LinkedMultiValueMap;
+import com.kaleert.nyagram.core.spi.BaseUrlController;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -57,6 +59,7 @@ public class NyagramClient {
     private final Executor taskExecutor;
     private final TokenBucketRateLimiter rateLimiter;
     private final NyagramBotConfig botConfig;
+    private final BaseUrlController baseUrlController;
     private final ExponentialBackoffStrategy backoffStrategy;
     private final ObjectProvider<NyagramProxyProvider> proxyProvider;
     private final Map<Class<?>, Boolean> multipartCache = new ConcurrentHashMap<>();
@@ -82,7 +85,8 @@ public class NyagramClient {
             AdvancedMultipartBuilder multipartBuilder,
             @Qualifier("botTaskExecutor") Executor taskExecutor,
             ExponentialBackoffStrategy backoffStrategy,
-            ObjectProvider<NyagramProxyProvider> proxyProvider
+            ObjectProvider<NyagramProxyProvider> proxyProvider,
+            BaseUrlController baseUrlController
     ) {
         this.botConfig = config;
         this.objectMapper = objectMapper;
@@ -90,15 +94,9 @@ public class NyagramClient {
         this.taskExecutor = taskExecutor;
         this.backoffStrategy = backoffStrategy;
         this.proxyProvider = proxyProvider;
+        this.baseUrlController = baseUrlController;
         this.rateLimiter = new TokenBucketRateLimiter(30, Duration.ofSeconds(1));
-
-        String baseUrl = config.getApiUrl().endsWith("/") 
-                ? config.getApiUrl() + "bot" + config.getBotToken() 
-                : config.getApiUrl() + "/bot" + config.getBotToken();
-
-        this.restClient = RestClient.builder()
-                .baseUrl(baseUrl)
-                .build();
+        this.restClient = RestClient.builder().build(); 
     }
     
     /**
@@ -147,8 +145,10 @@ public class NyagramClient {
             ProxyContextHolder.set(currentProxy);
         }
         
+        String currentBaseUrl = baseUrlController.getBaseUrl();
+        
         try {
-            return executeInternal(method);
+            return executeInternal(method, currentBaseUrl);
 
         } catch (HttpClientErrorException e) {
             int code = e.getStatusCode().value();
@@ -169,6 +169,8 @@ public class NyagramClient {
             throw e;
 
         } catch (ResourceAccessException | HttpServerErrorException e) {
+            baseUrlController.reportError(currentBaseUrl, e);
+            
             if (proxyProvider.getIfAvailable() != null && currentProxy != null) {
                 proxyProvider.getIfAvailable().onProxyError(currentProxy, e);
             }
@@ -192,9 +194,9 @@ public class NyagramClient {
     }
 
     @SneakyThrows
-    private <T extends Serializable> T executeInternal(BotApiMethod<T> method) {
-        String methodName = method.getMethod();
-        RestClient.RequestBodySpec requestSpec = restClient.post().uri("/" + methodName);
+    private <T extends Serializable> T executeInternal(BotApiMethod<T> method, String baseUrl) {
+        String uri = String.format("%s/bot%s/%s", baseUrl, botConfig.getBotToken(), method.getMethod());
+        RestClient.RequestBodySpec requestSpec = restClient.post().uri(uri);
     
         if (method instanceof MultipartRequest multipartRequest) {
             MultiValueMap<String, Object> body = buildMultipart(method, multipartRequest.getFiles());

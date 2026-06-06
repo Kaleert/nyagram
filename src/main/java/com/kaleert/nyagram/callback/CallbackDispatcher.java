@@ -8,10 +8,12 @@ import com.kaleert.nyagram.core.ArgumentResolver;
 import com.kaleert.nyagram.core.CommandResult;
 import com.kaleert.nyagram.exceptions.ArgumentParseException;
 import com.kaleert.nyagram.i18n.*;
+import com.kaleert.nyagram.ui.UIRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ public class CallbackDispatcher {
     private final List<ArgumentResolver<?>> resolvers;
     private final Optional<LocaleService> localeService;
     private final Optional<LocaleResolver> localeResolver;
+    private final UIRegistry uiRegistry;
     
     /**
      * Маршрутизирует входящий callback-запрос к соответствующему методу-обработчику.
@@ -55,6 +58,28 @@ public class CallbackDispatcher {
         if (update.getCallbackQuery() == null) return;
 
         String data = update.getCallbackQuery().getData();
+        
+        if (data.startsWith("ui:")) {
+            String[] parts = data.split(":");
+            if (parts.length >= 3) {
+                String menuId = parts[1];
+                String methodName = parts[2];
+                
+                Object menuBean = uiRegistry.getMenuBean(menuId);
+                if (menuBean != null) {
+                    try {
+                        Method targetMethod = menuBean.getClass().getDeclaredMethod(methodName, CommandContext.class);
+                        targetMethod.setAccessible(true);
+                        Object result = targetMethod.invoke(menuBean, context);
+                        handleResult(context, result);
+                        return;
+                    } catch (Exception e) {
+                        log.error("Failed to invoke UI Menu method {} for menu {}", methodName, menuId, e);
+                    }
+                }
+            }
+        }
+        
         CallbackMeta meta = registry.findMatch(data);
 
         if (meta == null) {

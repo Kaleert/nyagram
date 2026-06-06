@@ -9,6 +9,7 @@ import com.kaleert.nyagram.client.proxy.NyagramProxyProvider;
 import com.kaleert.nyagram.client.proxy.ProxyContextHolder;
 import com.kaleert.nyagram.core.spi.BotStateRepository;
 import com.kaleert.nyagram.core.spi.NyagramBotConfig;
+import com.kaleert.nyagram.core.spi.BaseUrlController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,7 @@ public class NyagramPoller {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final ObjectProvider<NyagramProxyProvider> proxyProvider;
+    private final BaseUrlController baseUrlController;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private ExecutorService pollerExecutor;
@@ -140,11 +142,7 @@ public class NyagramPoller {
             }
             
             try {
-                String apiUrl = botConfig.getApiUrl();
-                if (apiUrl.endsWith("/")) {
-                    apiUrl = apiUrl.substring(0, apiUrl.length() - 1);
-                }
-                
+                String apiUrl = baseUrlController.getBaseUrl();
                 String urlStr = String.format("%s/bot%s/getUpdates?timeout=%d&offset=%d",
                         apiUrl,
                         safeToken,

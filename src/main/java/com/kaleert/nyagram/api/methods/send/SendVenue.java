@@ -93,6 +93,14 @@ public class SendVenue extends BotApiMethod<Message> {
 
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -111,5 +119,15 @@ public class SendVenue extends BotApiMethod<Message> {
         if (longitude == null) throw new TelegramApiValidationException("Longitude is required", PATH);
         if (title == null || title.isEmpty()) throw new TelegramApiValidationException("Title is required", PATH);
         if (address == null || address.isEmpty()) throw new TelegramApiValidationException("Address is required", PATH);
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendVenue paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

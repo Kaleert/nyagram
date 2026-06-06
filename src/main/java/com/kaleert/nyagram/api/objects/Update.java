@@ -110,6 +110,9 @@ public class Update implements Serializable {
     @JsonProperty("managed_bot")
     private ManagedBotUpdated managedBot;
     
+    @JsonProperty("guest_message")
+    private Message guestMessage;
+    
     /**
      * Возвращает строковое представление типа обновления.
      *

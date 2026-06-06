@@ -81,6 +81,14 @@ public class SendContact extends BotApiMethod<Message> {
 
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
 
     @Override
     public String getMethod() {
@@ -97,5 +105,15 @@ public class SendContact extends BotApiMethod<Message> {
         if (chatId == null || chatId.isEmpty()) throw new TelegramApiValidationException("ChatId is required", PATH);
         if (phoneNumber == null || phoneNumber.isEmpty()) throw new TelegramApiValidationException("PhoneNumber is required", PATH);
         if (firstName == null || firstName.isEmpty()) throw new TelegramApiValidationException("FirstName is required", PATH);
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public SendContact paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
     }
 }

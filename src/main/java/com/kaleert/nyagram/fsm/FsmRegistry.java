@@ -34,29 +34,41 @@ public class FsmRegistry implements BeanPostProcessor { // <-- Реализуе�
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) {
         Class<?> targetClass = bean.getClass();
-
         if (targetClass.getName().contains("$$")) {
             targetClass = targetClass.getSuperclass();
         }
 
         for (Method method : targetClass.getDeclaredMethods()) {
             StateAction annotation = AnnotatedElementUtils.findMergedAnnotation(method, StateAction.class);
-            
             if (annotation != null) {
-                try {
-                    method.setAccessible(true);
-                    MethodHandle handle = MethodHandles.lookup().unreflect(method).bindTo(bean);
-                    
-                    stateHandlers.put(annotation.value(), new EventMeta(bean, method, handle));
-                    log.info("Registered FSM Handler for state: '{}' -> {}#{}", 
-                             annotation.value(), bean.getClass().getSimpleName(), method.getName());
-                             
-                } catch (IllegalAccessException e) {
-                    log.error("Failed to create MethodHandle for FSM handler: {}", method.getName(), e);
+                registerState(annotation.value(), bean, method);
+            }
+        }
+
+        com.kaleert.nyagram.fsm.wizard.Scene sceneAnn = AnnotatedElementUtils.findMergedAnnotation(targetClass, com.kaleert.nyagram.fsm.wizard.Scene.class);
+        if (sceneAnn != null) {
+            String sceneName = sceneAnn.value();
+            for (Method method : targetClass.getDeclaredMethods()) {
+                com.kaleert.nyagram.fsm.wizard.Step stepAnn = AnnotatedElementUtils.findMergedAnnotation(method, com.kaleert.nyagram.fsm.wizard.Step.class);
+                if (stepAnn != null) {
+                    String stateKey = sceneName + ":" + stepAnn.value();
+                    registerState(stateKey, bean, method);
                 }
             }
         }
+
         return bean;
+    }
+
+    private void registerState(String stateKey, Object bean, Method method) {
+        try {
+            method.setAccessible(true);
+            MethodHandle handle = MethodHandles.lookup().unreflect(method).bindTo(bean);
+            stateHandlers.put(stateKey, new EventMeta(bean, method, handle));
+            log.info("Registered FSM Handler for state: '{}' -> {}#{}", stateKey, bean.getClass().getSimpleName(), method.getName());
+        } catch (IllegalAccessException e) {
+            log.error("Failed to create MethodHandle for FSM handler: {}", method.getName(), e);
+        }
     }
     
     /**
