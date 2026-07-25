@@ -1,10 +1,10 @@
-package com.kaleert.nyagram.middleware;
+package pro.kaleert.nyagram.middleware;
 
-import com.kaleert.nyagram.api.objects.Update;
-import com.kaleert.nyagram.api.objects.message.Message;
-import com.kaleert.nyagram.client.NyagramClient;
-import com.kaleert.nyagram.command.CommandContext;
-import com.kaleert.nyagram.meta.CommandMeta;
+import pro.kaleert.nyagram.api.objects.Update;
+import pro.kaleert.nyagram.api.objects.message.Message;
+import pro.kaleert.nyagram.client.NyagramClient;
+import pro.kaleert.nyagram.command.CommandContext;
+import pro.kaleert.nyagram.meta.CommandMeta;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

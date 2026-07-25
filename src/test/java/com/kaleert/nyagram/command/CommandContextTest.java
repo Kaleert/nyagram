@@ -1,10 +1,10 @@
-package com.kaleert.nyagram.command;
+package pro.kaleert.nyagram.command;
 
-import com.kaleert.nyagram.api.methods.send.SendMessage;
-import com.kaleert.nyagram.api.objects.Update;
-import com.kaleert.nyagram.api.objects.chat.Chat;
-import com.kaleert.nyagram.api.objects.message.Message;
-import com.kaleert.nyagram.client.NyagramClient;
+import pro.kaleert.nyagram.api.methods.send.SendMessage;
+import pro.kaleert.nyagram.api.objects.Update;
+import pro.kaleert.nyagram.api.objects.chat.Chat;
+import pro.kaleert.nyagram.api.objects.message.Message;
+import pro.kaleert.nyagram.client.NyagramClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 

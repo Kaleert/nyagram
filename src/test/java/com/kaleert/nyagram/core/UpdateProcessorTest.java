@@ -1,11 +1,11 @@
-package com.kaleert.nyagram.core;
+package pro.kaleert.nyagram.core;
 
-import com.kaleert.nyagram.api.objects.Update;
-import com.kaleert.nyagram.callback.CallbackDispatcher;
-import com.kaleert.nyagram.client.NyagramClient;
-import com.kaleert.nyagram.core.concurrency.BotConcurrencyStrategy;
-import com.kaleert.nyagram.dispatcher.CommandDispatcher;
-import com.kaleert.nyagram.dispatcher.EventDispatcher;
+import pro.kaleert.nyagram.api.objects.Update;
+import pro.kaleert.nyagram.callback.CallbackDispatcher;
+import pro.kaleert.nyagram.client.NyagramClient;
+import pro.kaleert.nyagram.core.concurrency.BotConcurrencyStrategy;
+import pro.kaleert.nyagram.dispatcher.CommandDispatcher;
+import pro.kaleert.nyagram.dispatcher.EventDispatcher;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

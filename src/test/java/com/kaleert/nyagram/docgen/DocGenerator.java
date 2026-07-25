@@ -1,4 +1,4 @@
-package com.kaleert.nyagram.docgen;
+package pro.kaleert.nyagram.docgen;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -83,7 +83,7 @@ public class DocGenerator {
         }
 
         for (Map.Entry<String, List<ClassDoc>> entry : packageMap.entrySet()) {
-            String shortPkgName = entry.getKey().replace("com.kaleert.nyagram.", "");
+            String shortPkgName = entry.getKey().replace("pro.kaleert.nyagram.", "");
             packages.add(new PackageDoc(shortPkgName, entry.getValue()));
         }
         packages.sort(Comparator.comparing(p -> p.name));
@@ -153,7 +153,7 @@ public class DocGenerator {
             String pkgName = cu.getPackageDeclaration()
                     .map(pd -> pd.getNameAsString())
                     .orElse("default")
-                    .replace("com.kaleert.nyagram.", "");
+                    .replace("pro.kaleert.nyagram.", "");
 
             packageMap.putIfAbsent(pkgName, new ArrayList<>());
             List<ClassDoc> pkgClasses = packageMap.get(pkgName);

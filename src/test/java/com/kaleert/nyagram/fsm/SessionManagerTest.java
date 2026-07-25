@@ -1,6 +1,6 @@
-package com.kaleert.nyagram.fsm;
+package pro.kaleert.nyagram.fsm;
 
-import com.kaleert.nyagram.fsm.spi.SessionStore;
+import pro.kaleert.nyagram.fsm.spi.SessionStore;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

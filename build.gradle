@@ -81,7 +81,7 @@ tasks.named('test') {
 
 task generateDocs(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kaleert.nyagram.docgen.DocGenerator'
+    mainClass = 'pro.kaleert.nyagram.docgen.DocGenerator'
 }
 
 mavenPublishing {

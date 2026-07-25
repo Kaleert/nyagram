@@ -1,0 +1,180 @@
+package pro.kaleert.nyagram.api.methods.send;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import pro.kaleert.nyagram.api.exception.TelegramApiRequestException;
+import pro.kaleert.nyagram.api.exception.TelegramApiValidationException;
+import pro.kaleert.nyagram.api.meta.BotApiMethod;
+import pro.kaleert.nyagram.api.objects.ReplyParameters;
+import pro.kaleert.nyagram.api.objects.message.MessageEntity;
+import pro.kaleert.nyagram.api.objects.MessageId;
+import pro.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
+import lombok.*;
+
+import java.util.List;
+
+/**
+ * Используйте этот метод для копирования сообщений любого типа.
+ * <p>
+ * Метод аналогичен методу пересылки (Forward), но скопированное сообщение не будет иметь
+ * ссылки на оригинального отправителя.
+ * Возвращает {@link MessageId} отправленного сообщения.
+ * </p>
+ *
+ * @since 1.0.0
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CopyMessage extends BotApiMethod<MessageId> {
+    
+    /** Имя метода в Telegram Bot API. */
+    public static final String PATH = "copyMessage";
+
+    /**
+     * Уникальный идентификатор чата, КУДА копируется сообщение.
+     */
+    @JsonProperty("chat_id") 
+    private String chatId;
+    
+    /**
+     * Уникальный идентификатор чата, ОТКУДА копируется сообщение.
+     */
+    @JsonProperty("from_chat_id") 
+    private String fromChatId;
+    
+    /**
+     * Идентификатор копируемого сообщения.
+     */
+    @JsonProperty("message_id") 
+    private Integer messageId;
+    
+    /**
+     * Идентификатор топика.
+     */
+    @JsonProperty("message_thread_id") 
+    private Integer messageThreadId;
+    
+    /**
+     * Новая подпись. Если не указана, будет использована оригинальная подпись.
+     */
+    @JsonProperty("caption") 
+    private String caption;
+    
+    /**
+     * Режим парсинга новой подписи.
+     */
+    @JsonProperty("parse_mode") 
+    private String parseMode;
+    
+    /**
+     * Список сущностей для новой подписи.
+     */
+    @JsonProperty("caption_entities") 
+    private List<MessageEntity> captionEntities;
+    
+    /**
+     * Отключить уведомление.
+     */
+    @JsonProperty("disable_notification") 
+    private Boolean disableNotification;
+    
+    /**
+     * Защитить контент.
+     */
+    @JsonProperty("protect_content") 
+    private Boolean protectContent;
+    
+    /**
+     * Если сообщение является ответом, ID исходного сообщения.
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
+    @JsonProperty("reply_to_message_id")
+    private Integer replyToMessageId;
+
+    /**
+     * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
+     */
+    @Deprecated(since = "1.1.5")
+    @JsonProperty("allow_sending_without_reply")
+    private Boolean allowSendingWithoutReply;
+    
+    /**
+     * Параметры ответа. Заменяет reply_to_message_id.
+     * Необходим для ответов на варианты опросов (API 9.6).
+     */
+    @JsonProperty("reply_parameters")
+    private ReplyParameters replyParameters;
+    
+    /**
+     * Новая клавиатура.
+     */
+    @JsonProperty("reply_markup") 
+    private ReplyKeyboard replyMarkup;
+
+    @JsonProperty("message_effect_id")
+    private String messageEffectId;
+
+    /** Идентификатор бизнес-соединения. */
+    @JsonProperty("business_connection_id")
+    private String businessConnectionId;
+
+    /** Если True, подпись будет отображаться НАД медиафайлом (по умолчанию False - под ним). */
+    @JsonProperty("show_caption_above_media")
+    private Boolean showCaptionAboveMedia;
+    
+    /**
+     * Позволяет отправить сообщение даже тем пользователям, которые заблокировали бота, 
+     * за счет списания Telegram Stars с баланса бота.
+     * @since 1.2.0
+     */
+    @JsonProperty("allow_paid_broadcast")
+    private Boolean allowPaidBroadcast;
+
+    @Override public String getMethod() { return PATH; }
+
+    @Override
+    public MessageId deserializeResponse(String answer) throws TelegramApiRequestException {
+        return deserializeResponse(answer, MessageId.class);
+    }
+
+    @Override
+    public void validate() throws TelegramApiValidationException {
+        if (chatId == null) throw new TelegramApiValidationException("ChatId required", PATH);
+        if (fromChatId == null) throw new TelegramApiValidationException("FromChatId required", PATH);
+        if (messageId == null) throw new TelegramApiValidationException("MessageId required", PATH);
+    }
+
+    /**
+     * Отображает подпись над медиафайлом.
+     * @return текущий билдер.
+     */
+    public CopyMessage captionAbove() {
+        this.showCaptionAboveMedia = true;
+        return this;
+    }
+    
+    /**
+     * Добавляет эффект к сообщению (например, огонь, конфетти).
+     * @param effectId Уникальный ID эффекта.
+     * @return текущий билдер.
+     */
+    public CopyMessage withEffect(String effectId) {
+        this.messageEffectId = effectId;
+        return this;
+    }
+    
+    /**
+     * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
+     * @return текущий билдер.
+     * @since 1.2.0
+     */
+    public CopyMessage paidBroadcast() {
+        this.allowPaidBroadcast = true;
+        return this;
+    }
+}
