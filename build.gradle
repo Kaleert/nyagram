@@ -1,7 +1,9 @@
 import groovy.json.JsonSlurper
+import java.util.Base64
 
 plugins {
     id 'java-library'
+    id 'signing'
     id 'org.springframework.boot' version '3.2.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
@@ -151,6 +153,20 @@ task syncReadmeVersions {
         }
         println "✅ Synced Readme versions to ${v}"
     }
+}
+
+def signingKey = providers.gradleProperty("signingKey").orNull
+
+if (signingKey != null) {
+    signingKey = new String(Base64.decoder.decode(signingKey))
+}
+
+signing {
+    useInMemoryPgpKeys(
+            providers.gradleProperty("signingKeyId").orNull,
+            signingKey,
+            providers.gradleProperty("signingPassword").orNull
+    )
 }
 
 classes.dependsOn syncReadmeVersions
