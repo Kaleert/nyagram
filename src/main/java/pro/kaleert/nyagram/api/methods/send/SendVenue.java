@@ -7,6 +7,7 @@ import pro.kaleert.nyagram.api.exception.TelegramApiRequestException;
 import pro.kaleert.nyagram.api.exception.TelegramApiValidationException;
 import pro.kaleert.nyagram.api.meta.BotApiMethod;
 import pro.kaleert.nyagram.api.objects.message.Message;
+import pro.kaleert.nyagram.api.objects.message.EphemeralMessageParameters;
 import pro.kaleert.nyagram.api.objects.ReplyParameters;
 import pro.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
 import lombok.*;
@@ -101,6 +102,13 @@ public class SendVenue extends BotApiMethod<Message> {
      */
     @JsonProperty("allow_paid_broadcast")
     private Boolean allowPaidBroadcast;
+    
+    /** Параметры для эфемерных сообщений.
+    *
+    * @since 1.2.2
+    */
+    @JsonProperty("ephemeral_message_parameters")
+    private EphemeralMessageParameters ephemeralMessageParameters;
 
     @Override
     public String getMethod() {

@@ -45,7 +45,12 @@ public record InlineKeyboardButton(
     @JsonProperty("pay") Boolean pay,
     @JsonProperty("icon_custom_emoji_id") String iconCustomEmojiId,
     @JsonProperty("style") String style,
-    @JsonProperty("copy_text") CopyTextButton copyText
+    @JsonProperty("copy_text") CopyTextButton copyText,
+    
+    /*
+     * @since 1.2.2
+     */
+    @JsonProperty("disabled") Boolean disabled
 ) implements BotApiObject {
     
     /**
@@ -56,7 +61,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton url(String text, String url) {
-        return new InlineKeyboardButton(text, url, null, null, null, null, null, null, null, null, null, null, null);
+        return new InlineKeyboardButton(text, url, null, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -71,7 +76,7 @@ public record InlineKeyboardButton(
         if (callbackData != null && callbackData.getBytes().length > 64) {
              throw new IllegalArgumentException("Callback data must be <= 64 bytes");
         }
-        return new InlineKeyboardButton(text, null, callbackData, null, null, null, null, null, null, null, null, null, null);
+        return new InlineKeyboardButton(text, null, callbackData, null, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -82,7 +87,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton webApp(String text, WebAppInfo webAppInfo) {
-        return new InlineKeyboardButton(text, null, null, webAppInfo, null, null, null, null, null, null, null, null, null);
+        return new InlineKeyboardButton(text, null, null, webAppInfo, null, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -96,7 +101,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton switchInlineQuery(String text, String query) {
-        return new InlineKeyboardButton(text, null, null, null, null, query, null, null, null, null, null, null, null);
+        return new InlineKeyboardButton(text, null, null, null, null, query, null, null, null, null, null, null, null, null);
     }
     
     /**
@@ -107,7 +112,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton switchInlineQueryCurrentChat(String text, String query) {
-        return new InlineKeyboardButton(text, null, null, null, null, null, query, null, null, null, null, null, null);
+        return new InlineKeyboardButton(text, null, null, null, null, null, query, null, null, null, null, null, null, null);
     }
     
     /**
@@ -118,7 +123,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton login(String text, LoginUrl loginUrl) {
-        return new InlineKeyboardButton(text, null, null, null, loginUrl, null, null, null, null, null, null, null, null);
+        return new InlineKeyboardButton(text, null, null, null, loginUrl, null, null, null, null, null, null, null, null, null);
     }
 
     /**
@@ -131,7 +136,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton pay(String text) {
-        return new InlineKeyboardButton(text, null, null, null, null, null, null, null, null, true, null, null, null);
+        return new InlineKeyboardButton(text, null, null, null, null, null, null, null, null, true, null, null, null, null);
     }
     
     /**
@@ -142,7 +147,7 @@ public record InlineKeyboardButton(
      * @return объект кнопки.
      */
     public static InlineKeyboardButton switchInlineQueryChosenChat(String text, SwitchInlineQueryChosenChat switchChat) {
-        return new InlineKeyboardButton(text, null, null, null, null, null, null, switchChat, null, null, null, null, null);
+        return new InlineKeyboardButton(text, null, null, null, null, null, null, switchChat, null, null, null, null, null, null);
     }
     
     /**
@@ -155,6 +160,6 @@ public record InlineKeyboardButton(
      * @since 1.1.4
      */
     public static InlineKeyboardButton copyText(String buttonText, String textToCopy) {
-        return new InlineKeyboardButton(buttonText, null, null, null, null, null, null, null, null, null, null, null, new CopyTextButton(textToCopy));
+        return new InlineKeyboardButton(buttonText, null, null, null, null, null, null, null, null, null, null, null, new CopyTextButton(textToCopy), null);
     }
 }

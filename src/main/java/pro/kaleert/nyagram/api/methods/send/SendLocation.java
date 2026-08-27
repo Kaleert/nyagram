@@ -8,6 +8,7 @@ import pro.kaleert.nyagram.api.exception.TelegramApiValidationException;
 import pro.kaleert.nyagram.api.meta.BotApiMethod;
 import pro.kaleert.nyagram.api.objects.ReplyParameters;
 import pro.kaleert.nyagram.api.objects.message.Message;
+import pro.kaleert.nyagram.api.objects.message.EphemeralMessageParameters;
 import lombok.*;
 
 /**
@@ -93,6 +94,13 @@ public class SendLocation extends BotApiMethod<Message> {
     /** Идентификатор бизнес-соединения. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
+    
+    /** Параметры для эфемерных сообщений.
+    *
+    * @since 1.2.2
+    */
+    @JsonProperty("ephemeral_message_parameters")
+    private EphemeralMessageParameters ephemeralMessageParameters;
 
     @Override
     public String getMethod() {

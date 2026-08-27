@@ -154,12 +154,6 @@ public class NyagramPoller {
 
                 ResponseEntity<String> response = restTemplate.getForEntity(uri, String.class);
 
-                if (!response.getStatusCode().is2xxSuccessful()) {
-                    log.warn("Telegram API Error: {}", response.getStatusCode());
-                    ensureSafeDelay();
-                    continue;
-                }
-
                 UpdateResponse result = objectMapper.readValue(response.getBody(), UpdateResponse.class);
 
                 if (Boolean.TRUE.equals(result.getOk())) {
@@ -190,16 +184,21 @@ public class NyagramPoller {
                 }
                 log.warn("Network timeout. Retrying...");
             } catch (HttpClientErrorException e) {
-                if (e.getStatusCode().value() == 404) {
+                int statusCode = e.getStatusCode().value();
+                
+                if (statusCode == 404) {
                     log.error("❌ HTTP 404 Not Found. Check your token!");
                     log.error("👉 Configured Token: '{}'", safeToken); 
                     log.error("👉 Token Length: {}", safeToken.length());
                     stop(); 
-                } else if (e.getStatusCode().value() == 409 || e.getStatusCode().value() == 401) {
-                    log.error("⛔ Fatal Error: {}. Stopping.", e.getStatusCode());
+                } else if (statusCode == 409 || statusCode == 401) {
+                    log.error("⛔ Fatal Error: {}. Stopping.", statusCode);
                     stop();
+                } else if (statusCode == 429) {
+                    log.warn("⏳ Telegram API Rate Limit (429) on getUpdates. Delaying.");
+                    ensureSafeDelay();
                 } else {
-                    log.warn("HTTP Error: {}", e.getStatusCode());
+                    log.warn("HTTP Error on getUpdates: {}", statusCode);
                     ensureSafeDelay();
                 }
             } catch (Exception e) {

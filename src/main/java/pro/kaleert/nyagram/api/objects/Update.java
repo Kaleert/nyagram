@@ -11,6 +11,7 @@ import pro.kaleert.nyagram.api.objects.chat.Chat;
 import pro.kaleert.nyagram.api.objects.message.Message;
 import pro.kaleert.nyagram.api.objects.chatmember.ChatMember;
 import pro.kaleert.nyagram.api.objects.managedbots.ManagedBotUpdated;
+import pro.kaleert.nyagram.api.objects.payments.BotSubscriptionUpdated;
 
 import java.io.Serializable;
 import java.util.List;
@@ -113,6 +114,10 @@ public class Update implements Serializable {
     @JsonProperty("guest_message")
     private Message guestMessage;
     
+    @JsonProperty("subscription")
+    private BotSubscriptionUpdated subscription;
+    
+    
     /**
      * Возвращает строковое представление типа обновления.
      *
@@ -146,8 +151,10 @@ public class Update implements Serializable {
         if (deletedBusinessMessages != null) return "deleted_business_messages";
         if (businessConnection != null) return "business_connection";
         if (messageReactionCount != null) return "message_reaction_count";
+        if (guestMessage != null) return "guest_message";
         if (managedBot != null) return "managed_bot";
-
+        if (subscription != null) return "subscription";
+        
         return "unknown";
     }
     
@@ -180,6 +187,8 @@ public class Update implements Serializable {
         
         if (chatBoost != null) return chatBoost.getChat().getId();
         if (removedChatBoost != null) return removedChatBoost.getChat().getId();
+        
+        if (subscription != null && subscription.chat() != null) return subscription.chat().getId();
 
         return null;
     }
@@ -209,7 +218,9 @@ public class Update implements Serializable {
         if (businessMessage != null && businessMessage.getFrom() != null) return businessMessage.getFrom().getId();
         if (businessConnection != null) return businessConnection.getUser().getId();
         if (managedBot != null && managedBot.user() != null) return managedBot.user().getId();
-
+        
+        if (subscription != null && subscription.user() != null) return subscription.user().getId();
+        
         return null;
     }
     
@@ -237,6 +248,7 @@ public class Update implements Serializable {
         if (businessMessage != null && businessMessage.getFrom() != null) return businessMessage.getFrom();
         if (businessConnection != null) return businessConnection.getUser();
         if (managedBot != null) return managedBot.user();
+        if (subscription != null) return subscription.user();
         return null;
     }
     
@@ -336,6 +348,37 @@ public class Update implements Serializable {
     
     public boolean hasManagedBot() { return managedBot != null; }
     
+    public boolean hasSubscription() { return subscription != null; }
+    
+    /**
+     * Проверяет, является ли обновление изменением платной подписки (Telegram Stars) на бота.
+     * @return true, если это апдейт подписки.
+     * @since 1.2.2
+     */
+    @JsonIgnore
+    public boolean isSubscriptionUpdate() {
+        return subscription != null;
+    }
+
+    /**
+     * Проверяет, является ли обновление подключением бота к бизнес-аккаунту.
+     * @return true, если это привязка Business Connection.
+     * @since 1.2.2
+     */
+    @JsonIgnore
+    public boolean isBusinessConnection() {
+        return businessConnection != null;
+    }
+
+    /**
+     * Проверяет, пришло ли сообщение в рамках автоматизации личного чата (Telegram Business).
+     * @return true, если это бизнес-сообщение.
+     * @since 1.2.2
+     */
+    @JsonIgnore
+    public boolean isBusinessMessage() {
+        return businessMessage != null || editedBusinessMessage != null;
+    }
     /**
      * Описывает подключение бота к бизнес-аккаунту.
      *

@@ -23,7 +23,12 @@ import java.util.List;
 @Builder
 public record InlineKeyboardMarkup(
     @JsonProperty("inline_keyboard")
-    @Singular("row") List<List<InlineKeyboardButton>> inlineKeyboard
+    @Singular("row") List<List<InlineKeyboardButton>> inlineKeyboard,
+    
+    /*
+     * @since 1.2.2
+     */
+    @JsonProperty("force_reply") Boolean forceReply
 ) implements ReplyKeyboard {
 
     /**
@@ -32,7 +37,7 @@ public record InlineKeyboardMarkup(
      * @return клавиатура.
      */
     public static InlineKeyboardMarkup createSingle(InlineKeyboardButton button) {
-        return new InlineKeyboardMarkup(List.of(List.of(button)));
+        return new InlineKeyboardMarkup(List.of(List.of(button)), null);
     }
     
     /**
@@ -45,7 +50,7 @@ public record InlineKeyboardMarkup(
         for (InlineKeyboardButton btn : buttons) {
             rows.add(List.of(btn));
         }
-        return new InlineKeyboardMarkup(rows);
+        return new InlineKeyboardMarkup(rows, null);
     }
 
     /**
@@ -54,7 +59,7 @@ public record InlineKeyboardMarkup(
      * @return клавиатура.
      */
     public static InlineKeyboardMarkup createHorizontal(InlineKeyboardButton... buttons) {
-        return new InlineKeyboardMarkup(List.of(Arrays.asList(buttons)));
+        return new InlineKeyboardMarkup(List.of(Arrays.asList(buttons)), null);
     }
     
     @JsonIgnore

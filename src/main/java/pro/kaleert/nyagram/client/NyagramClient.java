@@ -155,9 +155,14 @@ public class NyagramClient {
         
             if (code == 429) {
                 long retryAfter = parseRetryAfter(e);
-                log.warn("⏳ Rate Limit (429) for {}. Sleeping {}s.", method.getMethod(), retryAfter);
-                sleep(retryAfter * 1000L + 100);
-                return executeWithRetry(method, attempt, 0);
+                log.warn("⏳ Rate Limit (429) for {}. Delayed retry in {}s.", method.getMethod(), retryAfter);
+                
+                try {
+                    return CompletableFuture.supplyAsync(() -> executeWithRetry(method, attempt, 0),
+                            CompletableFuture.delayedExecutor(retryAfter, TimeUnit.SECONDS, taskExecutor)).join();
+                } catch (Exception ex) {
+                    throw new RuntimeException("Failed during 429 delayed retry", ex);
+                }
             }
             
             if (code == 403) {

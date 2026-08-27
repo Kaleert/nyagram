@@ -31,5 +31,10 @@ public record ChatAdministratorRights(
     @JsonProperty("can_pin_messages") Boolean canPinMessages,
     @JsonProperty("can_manage_topics") Boolean canManageTopics,
     @JsonProperty("can_manage_direct_messages") Boolean canManageDirectMessages,
-    @JsonProperty("can_manage_tags") Boolean canManageTags
+    @JsonProperty("can_manage_tags") Boolean canManageTags,
+    
+    /*
+     * @since 1.2.2
+     */
+    @JsonProperty("can_send_welcome_messages") Boolean canSendWelcomeMessages
 ) implements BotApiObject {}

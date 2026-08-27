@@ -86,5 +86,11 @@ public enum EventType {
      * Создан управляемый бот или изменен его токен.
      * @since 1.1.5
      */
-    MANAGED_BOT_UPDATED;
+    MANAGED_BOT_UPDATED,
+    
+    /**
+     * Обновление статуса платной подписки пользователя на бота.
+     * @since 1.2.2
+     */
+    SUBSCRIPTION;
 }

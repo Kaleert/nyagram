@@ -124,6 +124,7 @@ public class EventDispatcher {
         if (update.getPollAnswer() != null) return EventType.POLL_ANSWER;
         if (update.getChatJoinRequest() != null) return EventType.CHAT_JOIN_REQUEST;
         if (update.getManagedBot() != null) return EventType.MANAGED_BOT_UPDATED;
+        if (update.getSubscription() != null) return EventType.SUBSCRIPTION;
         return null;
     }
 }

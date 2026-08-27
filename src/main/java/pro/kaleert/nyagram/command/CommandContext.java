@@ -138,6 +138,7 @@ public class CommandContext {
         else if (update.getMessageReaction() != null) cachedUser = update.getMessageReaction().getUser();
         else if (update.getInlineQuery() != null) cachedUser = update.getInlineQuery().getFrom();
         else if (update.getChannelPost() != null) cachedUser = update.getChannelPost().getFrom();
+        else if (update.getSubscription() != null) cachedUser = update.getSubscription().user();
         
         if (cachedUser == null) {
             if (fromId != null) {
@@ -229,8 +230,11 @@ public class CommandContext {
         return reply(text, parseMode, null, null);
     }
     
-    /**
+/**
      * Полный метод отправки сообщения с клавиатурой и ответом на конкретное сообщение.
+     * <p>
+     * Автоматически использует современный ReplyParameters вместо устаревшего reply_to_message_id.
+     * </p>
      *
      * @param text Текст сообщения.
      * @param parseMode Режим парсинга ("HTML", "MarkdownV2").
@@ -245,8 +249,13 @@ public class CommandContext {
                 .chatId(getChatId().toString())
                 .text(text)
                 .parseMode(parseMode)
-                .replyToMessageId(replyToMessageId)
                 .replyMarkup(replyMarkup);
+
+        if (replyToMessageId != null) {
+            msgBuilder.replyParameters(pro.kaleert.nyagram.api.objects.ReplyParameters.builder()
+                    .messageId(replyToMessageId)
+                    .build());
+        }
 
         getMessage()
                 .filter(m -> Boolean.TRUE.equals(m.getIsTopicMessage()))
@@ -440,5 +449,106 @@ public class CommandContext {
         return client.executeAsync(pro.kaleert.nyagram.api.methods.updatingmessages.DeleteMessage.of(chatId.toString(), targetId))
                 .exceptionally(ex -> null)
                 .thenApply(ignored -> null);
+    }
+    
+    /**
+     * Вставляет черновик (Draft) в поле ввода пользователя в текущем чате.
+     * <p>
+     * Идеально для ботов-ассистентов: бот не отправляет сообщение, 
+     * а подготавливает его, чтобы пользователь мог отредактировать перед отправкой.
+     * </p>
+     *
+     * @param text Текст черновика.
+     * @return Future с результатом выполнения.
+     * @since 1.2.2
+     */
+    public CompletableFuture<Boolean> setDraft(String text) {
+        var builder = pro.kaleert.nyagram.api.methods.send.SendMessageDraft.builder()
+                .chatId(getChatId().toString())
+                .text(text)
+                .parseMode("HTML");
+
+        Integer topicId = getTopicId();
+        if (topicId != null) builder.messageThreadId(topicId);
+
+        return client.executeAsync(builder.build());
+    }
+
+    /**
+     * Очищает поле ввода пользователя от черновика в текущем чате.
+     *
+     * @return Future с результатом.
+     * @since 1.2.2
+     */
+    public CompletableFuture<Boolean> clearDraft() {
+        return setDraft(""); // В Telegram API пустая строка очищает черновик
+    }
+
+    /**
+     * Получает информацию о бизнес-подключении для текущего контекста.
+     * <p>
+     * Если бот был добавлен в личный аккаунт Telegram Premium (Business Mode),
+     * этот метод вернет детали привязки.
+     * </p>
+     *
+     * @return Future с объектом BusinessConnection.
+     * @throws IllegalStateException если контекст не связан с бизнес-сообщением.
+     * @since 1.2.2
+     */
+    public CompletableFuture<Update.BusinessConnection> getBusinessConnection() {
+        String connId = null;
+        if (update.getBusinessConnection() != null) {
+            connId = update.getBusinessConnection().getId();
+        } else if (update.getBusinessMessage() != null) {
+            connId = update.getBusinessMessage().getBusinessConnectionId();
+        } else if (getMessage().isPresent() && getMessage().get().getBusinessConnectionId() != null) {
+            connId = getMessage().get().getBusinessConnectionId();
+        }
+
+        if (connId == null) {
+            return CompletableFuture.failedFuture(
+                new IllegalStateException("В текущем контексте нет бизнес-подключения (Business Connection ID не найден).")
+            );
+        }
+
+        return client.executeAsync(
+            pro.kaleert.nyagram.api.methods.business.GetBusinessConnection.builder()
+                .businessConnectionId(connId)
+                .build()
+        );
+    }
+
+    /**
+     * Быстро пересылает текущее сообщение в другой чат.
+     *
+     * @param targetChatId ID чата, куда нужно переслать сообщение.
+     * @return Future с отправленным сообщением.
+     * @since 1.2.2
+     */
+    public CompletableFuture<Message> forwardTo(Long targetChatId) {
+        return getMessage().map(msg -> 
+            client.executeAsync(pro.kaleert.nyagram.api.methods.send.ForwardMessage.builder()
+                    .chatId(targetChatId.toString())
+                    .fromChatId(getChatId().toString())
+                    .messageId(msg.getMessageId().intValue())
+                    .build())
+        ).orElseGet(() -> CompletableFuture.failedFuture(new IllegalStateException("Нет сообщения для пересылки")));
+    }
+
+    /**
+     * Быстро копирует текущее сообщение (без плашки "Переслано от") в другой чат.
+     *
+     * @param targetChatId ID чата, куда нужно скопировать сообщение.
+     * @return Future с ID нового сообщения.
+     * @since 1.2.2
+     */
+    public CompletableFuture<pro.kaleert.nyagram.api.objects.MessageId> copyTo(Long targetChatId) {
+        return getMessage().map(msg -> 
+            client.executeAsync(pro.kaleert.nyagram.api.methods.send.CopyMessage.builder()
+                    .chatId(targetChatId.toString())
+                    .fromChatId(getChatId().toString())
+                    .messageId(msg.getMessageId().intValue())
+                    .build())
+        ).orElseGet(() -> CompletableFuture.failedFuture(new IllegalStateException("Нет сообщения для копирования")));
     }
 }

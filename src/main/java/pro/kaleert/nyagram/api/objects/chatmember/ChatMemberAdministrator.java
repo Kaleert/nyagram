@@ -49,7 +49,12 @@ public record ChatMemberAdministrator(
     @JsonProperty("can_edit_stories") Boolean canEditStories,
     @JsonProperty("can_delete_stories") Boolean canDeleteStories,
     @JsonProperty("can_manage_direct_messages") Boolean canManageDirectMessages,
-    @JsonProperty("can_manage_tags") Boolean canManageTags
+    @JsonProperty("can_manage_tags") Boolean canManageTags,
+    
+    /*
+     * @since 1.2.2
+     */
+    @JsonProperty("can_send_welcome_messages") Boolean canSendWelcomeMessages
 ) implements ChatMember {
     
     @Override

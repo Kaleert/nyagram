@@ -38,7 +38,12 @@ public record ReplyKeyboardMarkup(
     @JsonProperty("resize_keyboard") Boolean resizeKeyboard,
     @JsonProperty("one_time_keyboard") Boolean oneTimeKeyboard,
     @JsonProperty("input_field_placeholder") String inputFieldPlaceholder,
-    @JsonProperty("selective") Boolean selective
+    @JsonProperty("selective") Boolean selective,
+    
+    /*
+     * @since 1.2.2
+     */
+    @JsonProperty("force_reply") Boolean forceReply
 ) implements ReplyKeyboard {
 
     /**

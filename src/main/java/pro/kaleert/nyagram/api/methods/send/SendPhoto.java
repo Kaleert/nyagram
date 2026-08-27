@@ -10,6 +10,7 @@ import pro.kaleert.nyagram.api.meta.MultipartRequest;
 import pro.kaleert.nyagram.api.methods.ParseMode;
 import pro.kaleert.nyagram.api.objects.InputFile;
 import pro.kaleert.nyagram.api.objects.message.MessageEntity;
+import pro.kaleert.nyagram.api.objects.message.EphemeralMessageParameters;
 import pro.kaleert.nyagram.api.objects.message.Message;
 import pro.kaleert.nyagram.api.objects.ReplyParameters;
 import pro.kaleert.nyagram.api.objects.replykeyboard.ReplyKeyboard;
@@ -133,6 +134,13 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
      */
     @JsonProperty("allow_paid_broadcast")
     private Boolean allowPaidBroadcast;
+    
+    /** Параметры для эфемерных сообщений.
+    *
+    * @since 1.2.2
+    */
+    @JsonProperty("ephemeral_message_parameters")
+    private EphemeralMessageParameters ephemeralMessageParameters;
 
     @Override
     public String getMethod() {

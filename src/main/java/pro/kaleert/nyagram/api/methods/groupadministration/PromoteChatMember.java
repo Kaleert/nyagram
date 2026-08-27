@@ -135,6 +135,12 @@ public class PromoteChatMember extends BotApiMethodBoolean {
     
     @JsonProperty("can_manage_tags")
     private Boolean canManageTags;
+    
+    /*
+     * @since 1.2.2
+     */
+    @JsonProperty("can_send_welcome_messages")
+    private Boolean canSendWelcomeMessages;
 
     @Override
     public String getMethod() {
@@ -183,6 +189,7 @@ public class PromoteChatMember extends BotApiMethodBoolean {
                     true)
                 .canManageDirectMessages(true)
                 .canManageTags(true)
+                .canSendWelcomeMessages(true)
                 .isAnonymous(false)
                 .build();
     }
