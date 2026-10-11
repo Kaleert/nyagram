@@ -250,4 +250,19 @@ public class NyagramAutoConfiguration {
     public LocaleResolver defaultLocaleResolver() {
         return userId -> java.util.Locale.forLanguageTag("ru");
     }
+
+    /**
+     * Регистрирует контроллер базового URL по умолчанию, 
+     * если разработчик не предоставил свою реализацию для динамического переключения.
+     * 
+     * @since 1.2.3
+     * @param config Конфигурация бота, содержащая базовый URL.
+     * @return Контроллер базового URL.
+     */
+    @Bean
+    @ConditionalOnMissingBean(BaseUrlController.class)
+    public BaseUrlController defaultBaseUrlController(NyagramBotConfig config) {
+        log.debug("Wiring default BaseUrlController");
+        return new pro.kaleert.nyagram.core.impl.DefaultBaseUrlController(config);
+    }
 }

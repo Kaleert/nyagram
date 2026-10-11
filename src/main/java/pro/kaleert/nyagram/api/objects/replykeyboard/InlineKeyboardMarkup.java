@@ -2,6 +2,7 @@ package pro.kaleert.nyagram.api.objects.replykeyboard;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import pro.kaleert.nyagram.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import lombok.Builder;
 import lombok.Singular;
@@ -21,6 +22,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record InlineKeyboardMarkup(
     @JsonProperty("inline_keyboard")
     @Singular("row") List<List<InlineKeyboardButton>> inlineKeyboard,
