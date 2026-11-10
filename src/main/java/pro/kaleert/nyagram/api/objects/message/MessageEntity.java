@@ -37,6 +37,8 @@ public record MessageEntity(
 ) implements BotApiObject {
     
     /** Тип сущности: упоминание пользователя (@username). */
+    public static final String TON_ADDRESS = "ton_address";
+    public static final String BANK_CARD_NUMBER = "bank_card_number";
     public static final String MENTION = "mention";
     
     /** Тип сущности: хештег (#hashtag). */

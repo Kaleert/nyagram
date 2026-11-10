@@ -132,6 +132,7 @@ public class SendVideo extends BotApiMethod<Message> implements MultipartRequest
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку без доступного исходного сообщения. Предпочтительнее replyParameters.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -190,7 +191,9 @@ public class SendVideo extends BotApiMethod<Message> implements MultipartRequest
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) {
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) {
             throw new TelegramApiValidationException("ChatId cannot be empty", PATH, "chat_id");
         }
         if (video == null) {

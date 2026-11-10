@@ -42,6 +42,7 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ExternalReplyInfo(
+    @JsonProperty("widget") pro.kaleert.nyagram.api.objects.widget.Widget widget,
     @JsonProperty("origin") MessageOrigin origin,
     @JsonProperty("chat") Chat chat,
     @JsonProperty("message_id") Integer messageId,
@@ -65,4 +66,9 @@ public record ExternalReplyInfo(
     @JsonProperty("location") Location location,
     @JsonProperty("poll") Poll poll,
     @JsonProperty("venue") Venue venue
-) implements BotApiObject {}
+) implements BotApiObject {    // BOTAPI104_OLD_RECORD_CONSTRUCTOR
+    @Deprecated(since = "1.2.4")
+    public ExternalReplyInfo(MessageOrigin origin, Chat chat, Integer messageId, LinkPreviewOptions linkPreviewOptions, Animation animation, Audio audio, Document document, List<PhotoSize> photo, Sticker sticker, Object story, Video video, VideoNote videoNote, Voice voice, Boolean hasMediaSpoiler, Contact contact, Dice dice, Game game, Object giveaway, Object giveawayWinners, Object invoice, Location location, Poll poll, Venue venue) {
+        this(null, origin, chat, messageId, linkPreviewOptions, animation, audio, document, photo, sticker, story, video, videoNote, voice, hasMediaSpoiler, contact, dice, game, giveaway, giveawayWinners, invoice, location, poll, venue);
+    }
+}

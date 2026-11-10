@@ -78,6 +78,7 @@ public class SendLocation extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку геопозиции без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -114,7 +115,12 @@ public class SendLocation extends BotApiMethod<Message> {
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null) throw new TelegramApiValidationException("ChatId обязателен", PATH, "chat_id");
+        // BOTAPI104_LOCATION_CALLBACK: a callback-only ephemeral reply does not require chat_id.
+        boolean callbackOnly = ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank();
+        if (chatId == null && !callbackOnly)
+            throw new TelegramApiValidationException("ChatId обязателен", PATH, "chat_id");
         if (latitude == null || longitude == null) {
             throw new TelegramApiValidationException("Координаты обязательны", PATH, "lat/lon");
         }

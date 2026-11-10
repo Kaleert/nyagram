@@ -23,10 +23,19 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> implements BotApiObject {
 
+    /** Имя JSON-поля признака успешного запроса: {@code ok}. */
     private static final String OK_FIELD = "ok";
+
+    /** Имя JSON-поля результата запроса: {@code result}. */
     private static final String RESULT_FIELD = "result";
+
+    /** Имя JSON-поля кода ошибки: {@code error_code}. */
     private static final String ERROR_CODE_FIELD = "error_code";
+
+    /** Имя JSON-поля описания ошибки: {@code description}. */
     private static final String DESCRIPTION_FIELD = "description";
+
+    /** Имя JSON-поля дополнительных параметров ошибки: {@code parameters}. */
     private static final String PARAMETERS_FIELD = "parameters";
 
     /**

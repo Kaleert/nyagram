@@ -16,6 +16,7 @@ import java.io.Serializable;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatBoostSource implements Serializable, BotApiObject {
+    
     /** Источник буста: "premium", "gift_code" или "giveaway". */
     @JsonProperty("source")
     private String source;
@@ -54,9 +55,9 @@ public class ChatBoostSource implements Serializable, BotApiObject {
     public void setSource(String source) { this.source = source; }
     
     /**
-     * Устанавливает пользователя, добавившего буст.
+     * Возвращает пользователя, добавившего буст.
      *
-     * @param user Объект пользователя.
+     * @return пользователь, который добавил буст, или null.
      */
     public User getUser() { return user; }
     

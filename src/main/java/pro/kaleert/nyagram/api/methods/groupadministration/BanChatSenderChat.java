@@ -18,9 +18,14 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BanChatSenderChat extends BotApiMethodBoolean {
+
+    /** Имя метода Telegram Bot API: {@code banChatSenderChat}. */
     public static final String PATH = "banChatSenderChat";
 
+    /** Идентификатор целевого чата или его публичное имя. */
     @JsonProperty("chat_id") private String chatId;
+    
+    /** Идентификатор канала, от имени которого запрещена отправка сообщений. */
     @JsonProperty("sender_chat_id") private Long senderChatId;
 
     @Override public String getMethod() { return PATH; }

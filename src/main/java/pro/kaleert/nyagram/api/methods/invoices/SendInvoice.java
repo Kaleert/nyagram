@@ -97,6 +97,7 @@ public class SendInvoice extends BotApiMethod<Message> {
     @JsonProperty("reply_markup")
     private InlineKeyboardMarkup replyMarkup;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
     
@@ -109,6 +110,7 @@ public class SendInvoice extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку счёта при отсутствии исходного сообщения для ответа. Предпочтительнее replyParameters.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")

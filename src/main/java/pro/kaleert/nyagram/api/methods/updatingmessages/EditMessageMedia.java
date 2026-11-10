@@ -33,23 +33,30 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EditMessageMedia extends BotApiMethod<Serializable> implements MultipartRequest {
 
+    /** Имя метода Telegram Bot API: {@code editMessageMedia}. */
     public static final String PATH = "editMessageMedia";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор сообщения в пределах чата. */
     @JsonProperty("message_id")
     private Integer messageId;
 
+    /** Идентификатор инлайн-сообщения, медиа которого заменяется. */
     @JsonProperty("inline_message_id")
     private String inlineMessageId;
 
+    /** Новое медиа-содержимое сообщения. */
     @JsonProperty("media")
     private InputMedia media;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private InlineKeyboardMarkup replyMarkup;
 
+    /** Идентификатор бизнес-подключения для отправки от его имени. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
 

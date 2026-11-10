@@ -18,5 +18,11 @@ import pro.kaleert.nyagram.api.meta.BotApiObject;
 })
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public sealed interface PaidMedia extends BotApiObject permits PaidMediaPreview, PaidMediaPhoto, PaidMediaVideo {
+    
+    /**
+     * Возвращает тип приобретённого платного медиафайла Telegram.
+     *
+     * @return тип медиа: preview, photo или video
+     */
     String getType();
 }

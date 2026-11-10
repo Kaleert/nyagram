@@ -12,7 +12,7 @@ import java.lang.reflect.Parameter;
 import java.util.Set;
 
 /**
- * Контейнерный класс, содержащий стандартные реализации {@link ArgumentResolver}
+ * Контейнерный класс, содержащий стандартные реализации {@link TypedArgumentResolver}
  * для базовых типов Java.
  *
  * @since 1.0.0

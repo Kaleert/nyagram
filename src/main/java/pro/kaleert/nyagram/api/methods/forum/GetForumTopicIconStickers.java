@@ -18,6 +18,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetForumTopicIconStickers extends BotApiMethod<List<Sticker>> {
+    
+    /** Имя метода Telegram Bot API: {@code getForumTopicIconStickers}. */
     public static final String PATH = "getForumTopicIconStickers";
 
     @Override

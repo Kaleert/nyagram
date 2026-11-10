@@ -67,6 +67,9 @@ public class ReplyParameters implements BotApiObject {
     /**
      * Опционально. Позиция цитаты в исходном сообщении (в UTF-16).
      */
+    @JsonProperty("quote_rich_texts")
+    private java.util.List<com.fasterxml.jackson.databind.JsonNode> quoteRichTexts;
+
     @JsonProperty("quote_position")
     private Integer quotePosition;
 
@@ -75,4 +78,12 @@ public class ReplyParameters implements BotApiObject {
      */
     @JsonProperty("poll_option_id")
     private String pollOptionId;
+    
+    /** Typed, lossless representation of Bot API quote_rich_texts. */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public java.util.List<pro.kaleert.nyagram.api.objects.richtext.RichTextValue> quoteRichTextsDecoded() {
+        if (quoteRichTexts == null) return java.util.List.of();
+        return quoteRichTexts.stream().map(pro.kaleert.nyagram.api.objects.richtext.RichTextValue::from).toList();
+    }
+
 }

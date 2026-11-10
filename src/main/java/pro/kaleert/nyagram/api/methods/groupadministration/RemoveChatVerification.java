@@ -21,6 +21,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoveChatVerification extends BotApiMethodBoolean {
 
+    /** Имя метода Telegram Bot API: {@code removeChatVerification}. */
     public static final String PATH = "removeChatVerification";
 
     /** Уникальный идентификатор целевого чата или username канала. */

@@ -16,8 +16,11 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class GetManagedBotToken extends BotApiMethod<String> {
+    
+    /** Имя метода Telegram Bot API: {@code getManagedBotToken}. */
     public static final String PATH = "getManagedBotToken";
 
+    /** Идентификатор управляемого бота, токен которого запрашивается. */
     @JsonProperty("bot_id")
     private Long botId;
 

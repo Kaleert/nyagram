@@ -26,32 +26,42 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SendContact extends BotApiMethod<Message> {
 
+    /** Имя метода Telegram Bot API: {@code sendContact}. */
     public static final String PATH = "sendContact";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор топика в супергруппе-форуме. */
     @JsonProperty("message_thread_id")
     private Integer messageThreadId;
 
+    /** Телефонный номер отправляемого контакта. */
     @JsonProperty("phone_number")
     private String phoneNumber;
 
+    /** Имя пользователя Telegram. */
     @JsonProperty("first_name")
     private String firstName;
 
+    /** Фамилия пользователя Telegram, если указана. */
     @JsonProperty("last_name")
     private String lastName;
 
+    /** Дополнительные данные контакта в формате vCard. */
     @JsonProperty("vcard")
     private String vcard;
 
+    /** Отправить сообщение без звукового уведомления. */
     @JsonProperty("disable_notification")
     private Boolean disableNotification;
 
+    /** Запретить пересылку и сохранение содержимого сообщения. */
     @JsonProperty("protect_content")
     private Boolean protectContent;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
 
@@ -64,6 +74,7 @@ public class SendContact extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку контакта без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -77,9 +88,11 @@ public class SendContact extends BotApiMethod<Message> {
     @JsonProperty("reply_parameters")
     private ReplyParameters replyParameters;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор бизнес-подключения для отправки от его имени. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
     
@@ -110,7 +123,9 @@ public class SendContact extends BotApiMethod<Message> {
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) throw new TelegramApiValidationException("ChatId is required", PATH);
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) throw new TelegramApiValidationException("ChatId is required", PATH);
         if (phoneNumber == null || phoneNumber.isEmpty()) throw new TelegramApiValidationException("PhoneNumber is required", PATH);
         if (firstName == null || firstName.isEmpty()) throw new TelegramApiValidationException("FirstName is required", PATH);
     }

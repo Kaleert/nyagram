@@ -21,11 +21,15 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeclineChatJoinRequest extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code declineChatJoinRequest}. */
     public static final String PATH = "declineChatJoinRequest";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Уникальный идентификатор пользователя Telegram. */
     @JsonProperty("user_id")
     private Long userId;
 

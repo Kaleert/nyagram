@@ -14,8 +14,10 @@ import pro.kaleert.nyagram.api.meta.Validable;
 @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = InputTextMessageContent.class),
+    @JsonSubTypes.Type(value = InputWidgetMessageContent.class),
+    @JsonSubTypes.Type(value = InputSharedWidgetMessageContent.class),
     @JsonSubTypes.Type(value = InputLocationMessageContent.class)
 })
 public sealed interface InputMessageContent extends BotApiObject, Validable 
-    permits InputTextMessageContent, InputLocationMessageContent {
+    permits InputTextMessageContent, InputLocationMessageContent, InputWidgetMessageContent, InputSharedWidgetMessageContent {
 }

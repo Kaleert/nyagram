@@ -29,26 +29,34 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EditMessageCaption extends BotApiMethod<Serializable> {
 
+    /** Имя метода Telegram Bot API: {@code editMessageCaption}. */
     public static final String PATH = "editMessageCaption";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор сообщения в пределах чата. */
     @JsonProperty("message_id")
     private Integer messageId;
 
+    /** Идентификатор инлайн-сообщения, подпись которого изменяется. */
     @JsonProperty("inline_message_id")
     private String inlineMessageId;
 
+    /** Подпись к медиафайлу. */
     @JsonProperty("caption")
     private String caption;
 
+    /** Режим обработки разметки: HTML, Markdown или MarkdownV2. */
     @JsonProperty("parse_mode")
     private String parseMode;
 
+    /** Сущности форматирования подписи к медиафайлу. */
     @JsonProperty("caption_entities")
     private List<MessageEntity> captionEntities;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private InlineKeyboardMarkup replyMarkup;
 

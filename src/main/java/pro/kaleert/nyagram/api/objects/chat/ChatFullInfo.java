@@ -59,6 +59,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ChatFullInfo(
+    @JsonProperty("ton_wallet_card") pro.kaleert.nyagram.api.objects.ton.TonWalletCard tonWalletCard,
+    @JsonProperty("share_theme") pro.kaleert.nyagram.api.objects.theme.ChatShareTheme shareTheme,
     @JsonProperty("id") Long id,
     @JsonProperty("type") String type,
     @JsonProperty("title") String title,
@@ -783,11 +785,21 @@ public record ChatFullInfo(
         return permissions.canPinMessages();
     }
 
+    /**
+     * Экранирует HTML-символы в отображаемом имени чата.
+     * @param text Исходный текст для экранирования.
+     * @return Безопасное для HTML строковое значение; для {@code null} — пустая строка.
+     */
     private String escapeHtml(String text) {
         if (text == null) return "";
         return text.replace("&", "&amp;")
                    .replace("<", "&lt;")
                    .replace(">", "&gt;")
                    .replace("\"", "&quot;");
+    }
+    
+    @Deprecated(since = "1.2.4")
+    public ChatFullInfo(Long id, String type, String title, String username, String firstName, String lastName, Boolean isForum, ChatPhoto photo, List<String> activeUsernames, Birthdate birthdate, BusinessIntro businessIntro, BusinessLocation businessLocation, BusinessOpeningHours businessOpeningHours, Chat personalChat, String bio, String description, String inviteLink, Message pinnedMessage, ChatPermissions permissions, Integer slowModeDelay, Integer messageAutoDeleteTime, Boolean hasAggressiveAntiSpamEnabled, Boolean hasHiddenMembers, Boolean hasProtectedContent, Boolean hasVisibleHistory, String stickerSetName, Boolean canSetStickerSet, Long linkedChatId, ChatLocation location, List<ReactionType> availableReactions, Integer accentColorId, String backgroundCustomEmojiId, Integer profileAccentColorId, String profileBackgroundCustomEmojiId, String emojiStatusCustomEmojiId, Long emojiStatusExpirationDate) {
+        this(null, null, id, type, title, username, firstName, lastName, isForum, photo, activeUsernames, birthdate, businessIntro, businessLocation, businessOpeningHours, personalChat, bio, description, inviteLink, pinnedMessage, permissions, slowModeDelay, messageAutoDeleteTime, hasAggressiveAntiSpamEnabled, hasHiddenMembers, hasProtectedContent, hasVisibleHistory, stickerSetName, canSetStickerSet, linkedChatId, location, availableReactions, accentColorId, backgroundCustomEmojiId, profileAccentColorId, profileBackgroundCustomEmojiId, emojiStatusCustomEmojiId, emojiStatusExpirationDate);
     }
 }

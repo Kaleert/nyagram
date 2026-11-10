@@ -51,30 +51,42 @@ public class Update implements Serializable {
     @JsonProperty("edited_channel_post")
     private Message editedChannelPost;
 
+    /** Подключение бизнес-аккаунта к боту. */
     @JsonProperty("business_connection")
     private BusinessConnection businessConnection;
 
+    /** Новое сообщение, связанное с бизнес-аккаунтом. */
     @JsonProperty("business_message")
     private Message businessMessage;
 
+    /** Изменённое сообщение бизнес-аккаунта. */
     @JsonProperty("edited_business_message")
     private Message editedBusinessMessage;
 
+    /** Сведения об удалённых сообщениях бизнес-аккаунта. */
     @JsonProperty("deleted_business_messages")
     private BusinessMessagesDeleted deletedBusinessMessages;
 
+    @JsonProperty("widget_query") private pro.kaleert.nyagram.api.objects.widget.WidgetQuery widgetQuery;
+    @JsonProperty("shared_widget_query") private pro.kaleert.nyagram.api.objects.widget.SharedWidgetQuery sharedWidgetQuery;
+
+    /** Callback-запрос, вызванный нажатием inline-кнопки. */
     @JsonProperty("callback_query")
     private CallbackQuery callbackQuery;
 
+    /** Inline-запрос пользователя к боту. */
     @JsonProperty("inline_query")
     private InlineQuery inlineQuery;
 
+    /** Выбранный пользователем результат inline-запроса. */
     @JsonProperty("chosen_inline_result")
     private ChosenInlineResult chosenInlineResult;
 
+    /** Запрос параметров доставки перед оплатой. */
     @JsonProperty("shipping_query")
     private ShippingQuery shippingQuery;
 
+    /** Запрос подтверждения платежа перед оплатой. */
     @JsonProperty("pre_checkout_query")
     private PreCheckoutQuery preCheckoutQuery;
 
@@ -84,36 +96,47 @@ public class Update implements Serializable {
     @JsonProperty("poll")
     private Poll poll;
 
+    /** Ответ пользователя на опрос Telegram. */
     @JsonProperty("poll_answer")
     private PollAnswer pollAnswer;
 
+    /** Обновление статуса самого бота в чате. */
     @JsonProperty("my_chat_member")
     private ChatMemberUpdated myChatMember;
 
+    /** Обновление статуса участника чата. */
     @JsonProperty("chat_member")
     private ChatMemberUpdated chatMember;
 
+    /** Заявка пользователя на вступление в чат. */
     @JsonProperty("chat_join_request")
     private ChatJoinRequest chatJoinRequest;
 
+    /** Обновление сведений о повышении уровня чата. */
     @JsonProperty("chat_boost")
     private ChatBoostUpdated chatBoost;
 
+    /** Сведения об отменённом повышении уровня чата. */
     @JsonProperty("removed_chat_boost")
     private ChatBoostRemoved removedChatBoost;
 
+    /** Обновление реакций на сообщение. */
     @JsonProperty("message_reaction")
     private MessageReactionUpdated messageReaction;
 
+    /** Обновление суммарного количества реакций на сообщение. */
     @JsonProperty("message_reaction_count")
     private MessageReactionCountUpdated messageReactionCount;
     
+    /** Обновление управляемого бота. */
     @JsonProperty("managed_bot")
     private ManagedBotUpdated managedBot;
     
+    /** Сообщение гостевого бота. */
     @JsonProperty("guest_message")
     private Message guestMessage;
     
+    /** Изменение подписки пользователя. */
     @JsonProperty("subscription")
     private BotSubscriptionUpdated subscription;
     
@@ -125,6 +148,8 @@ public class Update implements Serializable {
      */
     public String getType() {
         if (message != null) return "message";
+        if (widgetQuery != null) return "widget_query";
+        if (sharedWidgetQuery != null) return "shared_widget_query";
         if (callbackQuery != null) return "callback_query";
         if (editedMessage != null) return "edited_message";
         if (channelPost != null) return "channel_post";
@@ -346,8 +371,18 @@ public class Update implements Serializable {
      */
     public boolean hasMessageReaction() { return messageReaction != null; }
     
+    /**
+     * Проверяет, содержит ли обновление событие, связанное с управляемым ботом.
+     *
+     * @return {@code true}, если поле {@code managedBot} присутствует.
+     */
     public boolean hasManagedBot() { return managedBot != null; }
     
+    /**
+     * Проверяет, содержит ли обновление сведения об изменении подписки.
+     *
+     * @return {@code true}, если поле {@code subscription} присутствует.
+     */
     public boolean hasSubscription() { return subscription != null; }
     
     /**
@@ -379,6 +414,7 @@ public class Update implements Serializable {
     public boolean isBusinessMessage() {
         return businessMessage != null || editedBusinessMessage != null;
     }
+
     /**
      * Описывает подключение бота к бизнес-аккаунту.
      *
@@ -763,6 +799,7 @@ public class Update implements Serializable {
     public static class PollOption implements Serializable {
         /** Текст опции (1-100 символов). */
         private String text;
+
         /** Количество голосов за эту опцию. */
         @JsonProperty("voter_count") private Integer voterCount;
     }

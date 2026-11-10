@@ -38,8 +38,8 @@ import pro.kaleert.nyagram.api.objects.User;
 public sealed interface ChatMember extends BotApiObject 
     permits ChatMemberOwner, ChatMemberAdministrator, ChatMemberMember, 
             ChatMemberRestricted, ChatMemberLeft, ChatMemberBanned {
-    /**
-     * Статус участника в чате.
+    
+    /** * Статус участника в чате.
      * @return "creator", "administrator", "member", "restricted", "left" или "kicked".
      */
     String getStatus();

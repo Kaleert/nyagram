@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import pro.kaleert.nyagram.api.meta.BotApiObject;
 
+/**
+ * Настройки кнопки клавиатуры для запроса создания или выбора управляемого бота. Telegram возвращает результат с соответствующим идентификатором запроса.
+ *
+ * @since 1.2.4
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record KeyboardButtonRequestManagedBot(

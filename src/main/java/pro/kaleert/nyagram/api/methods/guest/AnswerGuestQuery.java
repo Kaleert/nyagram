@@ -23,11 +23,14 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AnswerGuestQuery extends BotApiMethod<SentGuestMessage> {
 
+    /** Имя метода Telegram Bot API: {@code answerGuestQuery}. */
     public static final String PATH = "answerGuestQuery";
 
+    /** Уникальный идентификатор гостевого запроса, на который отправляется ответ. */
     @JsonProperty("guest_query_id")
     private String guestQueryId;
 
+    /** Текст сообщения или содержимое текстового поля. */
     @JsonProperty("text")
     private String text;
 

@@ -18,11 +18,15 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EditUserStarSubscription extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code editUserStarSubscription}. */
     public static final String PATH = "editUserStarSubscription";
 
+    /** Уникальный идентификатор пользователя Telegram. */
     @JsonProperty("user_id")
     private Long userId;
 
+    /** Идентификатор списания Telegram Stars, связанного с редактируемой подпиской. */
     @JsonProperty("telegram_payment_charge_id")
     private String telegramPaymentChargeId;
 

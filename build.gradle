@@ -42,10 +42,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.fasterxml.jackson.core:jackson-core:2.16.1' 
+    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
     
-    testImplementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.16.1'
-    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
     
     testImplementation 'com.github.javaparser:javaparser-core:3.25.7'
     
@@ -88,7 +86,7 @@ task generateDocs(type: JavaExec) {
 
 mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL, true)
-    signAllPublications()
+    if (!gradle.startParameter.taskNames.any { it.toLowerCase().contains("mavenlocal") }) signAllPublications()
     coordinates(group, "nyagram", version)
 
     pom {

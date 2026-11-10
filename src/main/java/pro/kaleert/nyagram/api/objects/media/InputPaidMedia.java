@@ -24,8 +24,32 @@ import pro.kaleert.nyagram.api.objects.InputFile;
 public sealed interface InputPaidMedia extends BotApiObject, Validable 
     permits InputPaidMediaPhoto, InputPaidMediaVideo {
     
+    /**
+     * Возвращает тип платного медиа для сериализации в Telegram Bot API.
+     *
+     * @return тип платного медиа (photo или video)
+     */
     String getType();
+
+    /**
+     * Возвращает строковый источник платного медиафайла.
+     *
+     * @return file_id, URL или attach-идентификатор медиа
+     */
     String getMedia();
+
+    /**
+     * Возвращает локальный файл для отправки платного медиа через multipart.
+     *
+     * @return локальный файл или null, если он не используется
+     */
     InputFile getMediaFile();
+    
+    /**
+     * Создаёт или обновляет платное медиа с указанным строковым источником.
+     *
+     * @param media новый file_id, URL или attach-идентификатор медиа
+     * @return объект платного медиа с заданным источником
+     */
     InputPaidMedia withMedia(String media);
 }

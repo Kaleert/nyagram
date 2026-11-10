@@ -21,11 +21,14 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DeleteAllMessageReactions extends BotApiMethodBoolean {
 
+    /** Имя метода Telegram Bot API: {@code deleteAllMessageReactions}. */
     public static final String PATH = "deleteAllMessageReactions";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор сообщения в пределах чата. */
     @JsonProperty("message_id")
     private Integer messageId;
 

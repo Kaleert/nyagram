@@ -1,6 +1,8 @@
 package pro.kaleert.nyagram.api.objects;
 
 /**
+ * Действия, отображаемые пользователю в строке состояния чата, пока бот выполняет операцию. Значения передаются методу sendChatAction.
+ *
 * @since 1.1.4
 */
 public enum ChatAction {
@@ -18,5 +20,11 @@ public enum ChatAction {
 
     private final String value;
     ChatAction(String value) { this.value = value; }
+    
+    /**
+     * Возвращает строковое значение действия в формате, ожидаемом Telegram Bot API.
+     *
+     * @return значение действия, например {@code typing}.
+     */
     public String getValue() { return value; }
 }

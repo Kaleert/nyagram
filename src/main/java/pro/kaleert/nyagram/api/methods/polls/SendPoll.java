@@ -123,6 +123,7 @@ public class SendPoll extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку опроса при отсутствии сообщения для ответа. Предпочтительнее replyParameters.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -144,46 +145,57 @@ public class SendPoll extends BotApiMethod<Message> {
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
     
+    /** Разрешает участникам изменять ранее выбранный вариант ответа. */
     @JsonProperty("allows_revoting")
     private Boolean allowsRevoting;
 
+    /** Перемешивает варианты ответа при отображении опроса. */
     @JsonProperty("shuffle_options")
     private Boolean shuffleOptions;
 
+    /** Разрешает добавлять варианты ответа после публикации опроса. */
     @JsonProperty("allow_adding_options")
     private Boolean allowAddingOptions;
 
+    /** Скрывает результаты голосования до закрытия опроса. */
     @JsonProperty("hide_results_until_closes")
     private Boolean hideResultsUntilCloses;
 
+    /** Текстовое описание результата или ошибки, возвращённое Telegram. */
     @JsonProperty("description")
     private String description;
 
+    /** Режим разбора разметки дополнительного описания опроса. */
     @JsonProperty("description_parse_mode")
     private String descriptionParseMode;
 
+    /** Сущности форматирования дополнительного описания опроса. */
     @JsonProperty("description_entities")
     private List<MessageEntity> descriptionEntities;
     
     /**
+     * Дополнительный медиафайл, прикреплённый к опросу.
     * @since 1.2.0
     */
     @JsonProperty("media")
     private Object media;
         
     /**
+     * Медиафайл, показываемый вместе с объяснением ответа в викторине.
     * @since 1.2.0
     */
     @JsonProperty("explanation_media")
     private Object explanationMedia;
     
     /**
+     * Ограничивает участие в опросе участниками соответствующего сообщества.
     * @since 1.2.0
     */
     @JsonProperty("members_only")
     private Boolean membersOnly;
     
     /**
+     * Список двухбуквенных кодов стран, ограничивающий аудиторию опроса.
     * @since 1.2.0
     */
     @JsonProperty("country_codes")

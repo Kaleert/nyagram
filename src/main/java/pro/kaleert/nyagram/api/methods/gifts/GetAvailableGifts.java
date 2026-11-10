@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetAvailableGifts extends BotApiMethod<Gifts> {
 
+    /** Имя метода Telegram Bot API: {@code getAvailableGifts}. */
     public static final String PATH = "getAvailableGifts";
 
     @Override

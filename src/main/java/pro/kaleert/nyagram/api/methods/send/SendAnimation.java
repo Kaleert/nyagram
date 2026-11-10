@@ -33,50 +33,66 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SendAnimation extends BotApiMethod<Message> implements MultipartRequest {
 
+    /** Имя метода Telegram Bot API: {@code sendAnimation}. */
     public static final String PATH = "sendAnimation";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор топика в супергруппе-форуме. */
     @JsonProperty("message_thread_id")
     private Integer messageThreadId;
 
+    /** Анимация, прикреплённая к сообщению. */
     @JsonProperty("animation")
     private InputFile animation;
 
+    /** Продолжительность аудио или видео в секундах. */
     @JsonProperty("duration")
     private Integer duration;
 
+    /** Ширина изображения или медиа в пикселях. */
     @JsonProperty("width")
     private Integer width;
 
+    /** Высота изображения или медиа в пикселях. */
     @JsonProperty("height")
     private Integer height;
 
+    /** Миниатюра медиафайла для предварительного просмотра. */
     @JsonProperty("thumbnail")
     private InputFile thumbnail;
 
+    /** Подпись к медиафайлу. */
     @JsonProperty("caption")
     private String caption;
 
+    /** Режим обработки разметки: HTML, Markdown или MarkdownV2. */
     @JsonProperty("parse_mode")
     private String parseMode;
 
+    /** Сущности форматирования подписи к медиафайлу. */
     @JsonProperty("caption_entities")
     private List<MessageEntity> captionEntities;
 
+    /** Показывать подпись над медиафайлом, если Telegram поддерживает эту возможность. */
     @JsonProperty("show_caption_above_media")
     private Boolean showCaptionAboveMedia;
 
+    /** Скрывать медиа за спойлером до действия пользователя. */
     @JsonProperty("has_spoiler")
     private Boolean hasSpoiler;
 
+    /** Отправить сообщение без звукового уведомления. */
     @JsonProperty("disable_notification")
     private Boolean disableNotification;
 
+    /** Запретить пересылку и сохранение содержимого сообщения. */
     @JsonProperty("protect_content")
     private Boolean protectContent;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
 
@@ -89,6 +105,7 @@ public class SendAnimation extends BotApiMethod<Message> implements MultipartReq
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку анимации без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -102,9 +119,11 @@ public class SendAnimation extends BotApiMethod<Message> implements MultipartReq
     @JsonProperty("reply_parameters")
     private ReplyParameters replyParameters;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор бизнес-подключения для отправки от его имени. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
     
@@ -135,7 +154,9 @@ public class SendAnimation extends BotApiMethod<Message> implements MultipartReq
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) {
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) {
             throw new TelegramApiValidationException("ChatId is required", PATH);
         }
         if (animation == null) {

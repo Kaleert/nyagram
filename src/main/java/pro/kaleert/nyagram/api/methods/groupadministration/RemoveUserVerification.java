@@ -21,6 +21,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoveUserVerification extends BotApiMethodBoolean {
 
+    /** Имя метода Telegram Bot API: {@code removeUserVerification}. */
     public static final String PATH = "removeUserVerification";
 
     /** Уникальный идентификатор пользователя, у которого нужно забрать верификацию. */

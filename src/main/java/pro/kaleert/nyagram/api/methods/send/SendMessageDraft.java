@@ -23,20 +23,34 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SendMessageDraft extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code sendMessageDraft}. */
     public static final String PATH = "sendMessageDraft";
 
+    /** Идентификатор чата, в котором создаётся черновик сообщения. */
     @JsonProperty("chat_id") private String chatId;
+
+    /** Идентификатор темы форума для черновика, если применимо. */
     @JsonProperty("message_thread_id") private Integer messageThreadId;
     
     /** В API 10.3 текст может быть пустым для очистки черновика. */
     @JsonProperty("text") private String text;
+
+    /** Режим разбора форматирования текста черновика. */
     @JsonProperty("parse_mode") private String parseMode;
+
+    /** Сущности форматирования текста черновика. */
     @JsonProperty("entities") private List<MessageEntity> entities;
+
+    /** Настройки предпросмотра ссылок в черновике. */
     @JsonProperty("link_preview_options") private LinkPreviewOptions linkPreviewOptions;
+
+    /** Параметры ответа на другое сообщение. */
     @JsonProperty("reply_parameters") private ReplyParameters replyParameters;
     
     /** Остановить генерацию черновика (например, если бот "печатает"). */
     @JsonProperty("can_stop") private Boolean canStop;
+    
     /** Сохранять черновик, если генерация остановлена. */
     @JsonProperty("keep_on_stop") private Boolean keepOnStop;
 

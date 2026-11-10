@@ -92,6 +92,7 @@ public class DocGenerator {
         File outFile = new File(OUTPUT_FILE);
         if (outFile.getParentFile() != null) outFile.getParentFile().mkdirs();
         mapper.writeValue(outFile, root);
+        auditDocumentation(root);
         
         System.out.println("\n✅ Файл сохранен: " + outFile.getAbsolutePath());
         
@@ -102,6 +103,36 @@ public class DocGenerator {
     private static void printProgress(int current, int total) {
         int percent = (current * 100) / total;
         System.out.print("\r[" + "=".repeat(percent / 2) + " ".repeat(50 - (percent / 2)) + "] " + percent + "%");
+    }
+
+    /** Подсчитывает реально сформированные элементы API, а не число исходных файлов. */
+    private static void auditDocumentation(ApiRoot root) {
+        totalDocsCount.set(0);
+        missingDocsCount.set(0);
+        gapList.clear();
+        for (PackageDoc pkg : root.packages()) {
+            for (ClassDoc type : pkg.items()) {
+                auditItem(pkg.name(), type.name(), "CLASS", type.description());
+                for (FieldDoc field : type.fields())
+                    auditItem(pkg.name(), type.name() + "." + field.name(), "FIELD", field.description());
+                for (MethodDoc method : type.methods()) {
+                    auditItem(pkg.name(), type.name() + "." + method.name(), "METHOD", method.description());
+                    for (ParamDoc param : method.parameters())
+                        auditItem(pkg.name(), type.name() + "." + method.name() + "(" + param.name() + ")", "PARAM", param.desc());
+                }
+                for (MethodDoc ctor : type.constructors()) {
+                    for (ParamDoc param : ctor.parameters())
+                        auditItem(pkg.name(), type.name() + "(" + param.name() + ")", "PARAM", param.desc());
+                }
+            }
+        }
+    }
+
+    private static void auditItem(String pkg, String location, String kind, String description) {
+        totalDocsCount.incrementAndGet();
+        if (isDescriptionEmpty(description) || "Record component".equals(description)) {
+            addGap(pkg, location, kind, "Добавить осмысленное описание в Javadoc", calculateWeight(pkg, kind));
+        }
     }
 
     private static void printFinalStats() {
@@ -129,16 +160,16 @@ public class DocGenerator {
         }
 
         System.out.println("\n" + "=".repeat(60));
-        System.out.println("📋 ЧЕК-ЛИСТ (ТОП-15 ВАЖНЫХ ПРОПУСКОВ)");
+        System.out.println("📋 ЧЕК-ЛИСТ (ТОП-45 ВАЖНЫХ ПРОПУСКОВ)");
         System.out.println("=".repeat(60));
 
         gapList.sort(Comparator.comparingInt(Gap::weight).reversed().thenComparing(Gap::location));
 
-        int limit = 15;
+        int limit = 45;
         for (int i = 0; i < Math.min(gapList.size(), limit); i++) {
             Gap gap = gapList.get(i);
             System.out.printf("[%d] %-10s %s\n", (i + 1), gap.type, gap.location);
-            System.out.printf("    👉 %s\n", gap.todo);
+            
         }
         System.out.println("-".repeat(60));
     }
@@ -146,7 +177,11 @@ public class DocGenerator {
     private static void parseFile(Path path, Map<String, List<ClassDoc>> packageMap) {
         try {
             ParseResult<CompilationUnit> result = parser.parse(path);
-            if (!result.isSuccessful()) return;
+            if (!result.isSuccessful()) {
+                System.err.println("[DocGenerator] Не удалось разобрать: " + path);
+                result.getProblems().forEach(problem -> System.err.println("  " + problem));
+                return;
+            }
             CompilationUnit cu = result.getResult().orElse(null);
             if (cu == null) return;
 
@@ -219,7 +254,7 @@ public class DocGenerator {
                         String desc = rc.getComment()
                                 .filter(c -> c.isJavadocComment())
                                 .map(c -> javadocToMarkdown(c.asJavadocComment().parse().getDescription().toText()))
-                                .orElse("Record component");
+                                .orElseGet(() -> extractParamMap(rec).getOrDefault(name, "No description provided."));
                         
                         fields.add(new FieldDoc(name, fieldType, "private final", desc, getLine(rc), null));
                     });
@@ -355,7 +390,7 @@ public class DocGenerator {
     }
 
     private static boolean isDescriptionEmpty(String desc) {
-        return desc == null || desc.isBlank() || desc.equals("No description provided.");
+        return desc == null || desc.isBlank() || desc.equals("No description provided.") || desc.equals("No description.");
     }
 
     private static int calculateWeight(String pkg, String type) {

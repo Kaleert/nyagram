@@ -25,11 +25,14 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SendDice extends BotApiMethod<Message> {
 
+    /** Имя метода Telegram Bot API: {@code sendDice}. */
     public static final String PATH = "sendDice";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор топика в супергруппе-форуме. */
     @JsonProperty("message_thread_id")
     private Integer messageThreadId;
 
@@ -39,12 +42,15 @@ public class SendDice extends BotApiMethod<Message> {
     @JsonProperty("emoji")
     private String emoji;
 
+    /** Отправить сообщение без звукового уведомления. */
     @JsonProperty("disable_notification")
     private Boolean disableNotification;
 
+    /** Запретить пересылку и сохранение содержимого сообщения. */
     @JsonProperty("protect_content")
     private Boolean protectContent;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
 
@@ -57,6 +63,7 @@ public class SendDice extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку анимированного эмодзи без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -70,9 +77,11 @@ public class SendDice extends BotApiMethod<Message> {
     @JsonProperty("reply_parameters")
     private ReplyParameters replyParameters;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор бизнес-подключения для отправки от его имени. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
     

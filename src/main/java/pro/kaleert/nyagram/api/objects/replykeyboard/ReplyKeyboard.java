@@ -11,7 +11,7 @@ import pro.kaleert.nyagram.api.meta.Validable;
  *     <li>{@link InlineKeyboardMarkup} - клавиатура под сообщением.</li>
  *     <li>{@link ReplyKeyboardMarkup} - кастомная клавиатура вместо системной.</li>
  *     <li>{@link ReplyKeyboardRemove} - удаление клавиатуры.</li>
- *     <li>{@link ForceReply} - принудительный ответ.</li>
+ *     <li>{@code ForceReply} - принудительный ответ.</li>
  * </ul>
  * </p>
  *

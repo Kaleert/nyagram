@@ -9,8 +9,13 @@ import lombok.Getter;
  */
 @Getter
 public class TelegramApiException extends RuntimeException {
+    
+    /** Числовой код ошибки Telegram Bot API; присутствует при ошибочном ответе. */
     private final Integer errorCode;
+
+    /** Текстовое описание результата или ошибки, возвращённое Telegram. */
     private final String description;
+    
     private final String apiMethod;
     
     /**

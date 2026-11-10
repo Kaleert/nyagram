@@ -22,11 +22,14 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SetChatMemberTag extends BotApiMethodBoolean {
     
+    /** Имя метода Telegram Bot API: {@code setChatMemberTag}. */
     public static final String PATH = "setChatMemberTag";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Уникальный идентификатор пользователя Telegram. */
     @JsonProperty("user_id")
     private Long userId;
 

@@ -23,11 +23,15 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AnswerWebAppQuery extends BotApiMethod<AnswerWebAppQuery.SentWebAppMessage> {
+    
+    /** Имя метода Telegram Bot API: {@code answerWebAppQuery}. */
     public static final String PATH = "answerWebAppQuery";
 
+    /** Идентификатор Web App-запроса, на который отвечает бот. */
     @JsonProperty("web_app_query_id")
     private String webAppQueryId;
 
+    /** Инлайн-результат, отправляемый в ответ на Web App-запрос. */
     @JsonProperty("result")
     private InlineQueryResult result;
 
@@ -45,6 +49,10 @@ public class AnswerWebAppQuery extends BotApiMethod<AnswerWebAppQuery.SentWebApp
         if (result == null) throw new TelegramApiValidationException("Result is required", PATH);
     }
 
+    /**
+     * Результат отправки сообщения от имени пользователя после ответа на запрос Web App.
+     * @param inlineMessageId Идентификатор отправленного инлайн-сообщения; может отсутствовать.
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record SentWebAppMessage(
         @JsonProperty("inline_message_id") String inlineMessageId

@@ -20,11 +20,15 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetUserChatBoosts extends BotApiMethod<UserChatBoosts> {
+    
+    /** Имя метода Telegram Bot API: {@code getUserChatBoosts}. */
     public static final String PATH = "getUserChatBoosts";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Уникальный идентификатор пользователя Telegram. */
     @JsonProperty("user_id")
     private Long userId;
 

@@ -18,8 +18,11 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CloseGeneralForumTopic extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code closeGeneralForumTopic}. */
     public static final String PATH = "closeGeneralForumTopic";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 

@@ -21,7 +21,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ResponseParameters implements BotApiObject {
 
+    /** Имя JSON-поля нового идентификатора чата после миграции: {@code migrate_to_chat_id}. */
     private static final String MIGRATE_TO_CHAT_ID_FIELD = "migrate_to_chat_id";
+
+    /** Имя JSON-поля времени ожидания при ограничении запросов: {@code retry_after}. */
     private static final String RETRY_AFTER_FIELD = "retry_after";
 
     /**

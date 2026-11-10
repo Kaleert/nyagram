@@ -22,8 +22,11 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetChatMenuButton extends BotApiMethod<MenuButton> {
+    
+    /** Имя метода Telegram Bot API: {@code getChatMenuButton}. */
     public static final String PATH = "getChatMenuButton";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 

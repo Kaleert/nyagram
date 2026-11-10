@@ -16,8 +16,16 @@ import java.util.List;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateResponse {
+
+    /** Признак успешного выполнения запроса Telegram Bot API. */
     private Boolean ok;
+
+    /** Результат успешного запроса; конкретный тип зависит от метода Bot API. */
     private List<Update> result;
+
+    /** Текстовое описание результата или ошибки, возвращённое Telegram. */
     private String description;
+    
+    /** Числовой код ошибки Telegram Bot API; присутствует при ошибочном ответе. */
     private Integer errorCode;
 }

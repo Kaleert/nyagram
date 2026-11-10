@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class PriceBuilder {
 
+    /** Массив ценовых компонентов счёта. */
     private final List<LabeledPrice> prices = new ArrayList<>();
     
     /**

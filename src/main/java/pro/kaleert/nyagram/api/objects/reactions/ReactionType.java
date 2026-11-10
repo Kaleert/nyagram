@@ -22,5 +22,10 @@ import pro.kaleert.nyagram.api.meta.Validable;
         @JsonSubTypes.Type(value = ReactionTypePaid.class, name = "paid")
 })
 public interface ReactionType extends BotApiObject, Validable {
+    
+    /** * Возвращает идентификатор разновидности реакции Telegram.
+     *
+     * @return тип реакции, используемый для сериализации
+     */
     String getType();
 }

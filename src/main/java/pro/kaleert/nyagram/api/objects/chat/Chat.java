@@ -130,8 +130,16 @@ public record Chat(
     @JsonIgnore
     public boolean isChannelChat() { return isChannel(); }
 
+    /**
+     * Возвращает необязательный признак чата личных сообщений.
+     * @return Значение признака или {@code null}, если Telegram его не передал.
+     */
     public Boolean getIsDirectMessages() { return isDirectMessages; }
     
+    /**
+     * Проверяет, является ли чат чатом личных сообщений.
+     * @return {@code true}, только если соответствующий признак явно установлен.
+     */
     @JsonIgnore
     public boolean isDirectMessagesChat() { return Boolean.TRUE.equals(isDirectMessages); }
     

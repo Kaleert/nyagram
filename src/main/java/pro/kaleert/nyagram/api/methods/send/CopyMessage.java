@@ -97,6 +97,7 @@ public class CopyMessage extends BotApiMethod<MessageId> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает копирование сообщения, даже если сообщение для ответа не найдено.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -116,6 +117,7 @@ public class CopyMessage extends BotApiMethod<MessageId> {
     @JsonProperty("reply_markup") 
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
 

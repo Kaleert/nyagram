@@ -130,6 +130,10 @@ import java.util.List;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record Message(
+    @JsonProperty("ton_wallet_transfer") pro.kaleert.nyagram.api.objects.ton.TonWalletTransfer tonWalletTransfer,
+    @JsonProperty("paid_messages_waived") PaidMessagesWaived paidMessagesWaived,
+    @JsonProperty("widget") pro.kaleert.nyagram.api.objects.widget.Widget widget,
+
     /** Уникальный идентификатор сообщения внутри чата. */
     @JsonProperty("message_id") Long messageId,
     
@@ -898,29 +902,114 @@ public record Message(
      */
     public InlineKeyboardMarkup getReplyMarkup() { return replyMarkup; }
 
+    /**
+     * Возвращает бота, отправившего сообщение от имени бизнес-аккаунта.
+     *
+     * @return отправивший бот или null
+     */
     public User getSenderBusinessBot() { return senderBusinessBot; }
+    /**
+     * Возвращает идентификатор бизнес-подключения, через которое получено сообщение.
+     *
+     * @return идентификатор бизнес-подключения или null
+     */
     public String getBusinessConnectionId() { return businessConnectionId; }
+    /**
+     * Сообщает, было ли бизнес-сообщение отправлено в отсутствие владельца аккаунта.
+     *
+     * @return признак отправки офлайн или null, если поле отсутствует
+     */
     public Boolean getIsFromOffline() { return isFromOffline; }
+    /**
+     * Возвращает идентификатор эффекта анимации сообщения.
+     *
+     * @return идентификатор эффекта или null
+     */
     public String getEffectId() { return effectId; }
+    /**
+     * Сообщает, расположена ли подпись над медиа.
+     *
+     * @return true, если подпись над медиа; false или null в остальных случаях
+     */
     public Boolean getShowCaptionAboveMedia() { return showCaptionAboveMedia; }
+    /**
+     * Возвращает информацию о платном медиаконтенте сообщения.
+     *
+     * @return данные платного медиа или null
+     */
     public pro.kaleert.nyagram.api.objects.media.PaidMediaInfo getPaidMedia() { return paidMedia; }
+    /**
+     * Возвращает сведения о возврате платежа.
+     *
+     * @return данные возврата платежа или null
+     */
     public pro.kaleert.nyagram.api.objects.payments.RefundedPayment getRefundedPayment() { return refundedPayment; }
+    /**
+     * Сообщает, относится ли сообщение к личным сообщениям канала.
+     *
+     * @return признак личного сообщения канала или null, если поле отсутствует
+     */
     public Boolean getIsDirectMessage() { return isDirectMessage; }
+    /**
+     * Сообщает, является ли сообщение предложенным постом.
+     *
+     * @return признак предложенного поста или null, если поле отсутствует
+     */
     public Boolean getIsSuggested() { return isSuggested; }
+    /**
+     * Возвращает служебные данные о создании управляемого бота.
+     *
+     * @return данные создания управляемого бота или null
+     */
     public ManagedBotCreated getManagedBotCreated() { return managedBotCreated; }
+    /**
+     * Возвращает событие добавления варианта опроса.
+     *
+     * @return данные события или null
+     */
     public PollOptionAdded getPollOptionAdded() { return pollOptionAdded; }
+    /**
+     * Возвращает событие удаления варианта опроса.
+     *
+     * @return данные события или null
+     */
     public PollOptionDeleted getPollOptionDeleted() { return pollOptionDeleted; }
+    /**
+     * Возвращает идентификатор варианта опроса, к которому относится ответ.
+     *
+     * @return идентификатор варианта или null
+     */
     public String getReplyToPollOptionId() { return replyToPollOptionId; }
 
+    /**
+     * Проверяет, содержит ли сообщение платные медиа.
+     *
+     * @return true, если сведения о платных медиа присутствуют
+     */
     @JsonIgnore
     public boolean hasPaidMedia() { return paidMedia != null; }
 
+    /**
+     * Проверяет наличие непустого идентификатора эффекта сообщения.
+     *
+     * @return true, если эффект задан
+     */
     @JsonIgnore
     public boolean hasEffect() { return effectId != null && !effectId.isBlank(); }
 
+    /**
+     * Проверяет, отображается ли подпись над медиафайлом.
+     *
+     * @return true, если подпись располагается над медиа
+     */
     @JsonIgnore
     public boolean isCaptionAbove() { return Boolean.TRUE.equals(showCaptionAboveMedia); }
 
+    /**
+     * Проверяет, содержит ли сообщение сведения о возврате платежа.
+     *
+     * @return true, если данные возврата присутствуют
+     */
     @JsonIgnore
     public boolean hasRefundedPayment() { return refundedPayment != null; }
     
@@ -1725,4 +1814,9 @@ public record Message(
     * @since 1.2.0
     */
     public GiftInfo getGift() { return gift; }
+    // BOTAPI104_OLD_RECORD_CONSTRUCTOR
+    @Deprecated(since = "1.2.4")
+    public Message(Long messageId, Integer messageThreadId, User from, Chat senderChat, Integer date, Chat chat, MessageOrigin forwardOrigin, Integer forwardDate, Boolean isTopicMessage, Boolean isAutomaticForward, Message replyToMessage, ExternalReplyInfo externalReplyInfo, TextQuote textQuote, User viaBot, Integer editDate, Boolean hasProtectedContent, String mediaGroupId, String authorSignature, String text, List<MessageEntity> entities, LinkPreviewOptions linkPreviewOptions, Animation animation, Audio audio, Document document, List<PhotoSize> photo, Sticker sticker, Story story, Video video, VideoNote videoNote, Voice voice, String caption, List<MessageEntity> captionEntities, Boolean hasMediaSpoiler, Contact contact, Dice dice, Game game, Poll poll, Venue venue, Location location, List<User> newChatMembers, User leftChatMember, String newChatTitle, List<PhotoSize> newChatPhoto, Boolean deleteChatPhoto, Boolean groupChatCreated, Boolean supergroupChatCreated, Boolean channelChatCreated, MessageAutoDeleteTimerChanged messageAutoDeleteTimerChanged, Long migrateToChatId, Long migrateFromChatId, MaybeInaccessibleMessage pinnedMessage, Invoice invoice, SuccessfulPayment successfulPayment, UsersShared usersShared, ChatShared chatShared, String connectedWebsite, WriteAccessAllowed writeAccessAllowed, PassportData passportData, ProximityAlertTriggered proximityAlertTriggered, ChatBoostAdded boostAdded, ForumTopic forumTopicCreated, ForumTopicEdited forumTopicEdited, ForumTopicClosed forumTopicClosed, ForumTopicReopened forumTopicReopened, GeneralForumTopicHidden generalForumTopicHidden, GeneralForumTopicUnhidden generalForumTopicUnhidden, VideoChatScheduled videoChatScheduled, VideoChatStarted videoChatStarted, VideoChatEnded videoChatEnded, VideoChatParticipantsInvited videoChatParticipantsInvited, GiveawayCreated giveawayCreated, Giveaway giveaway, GiveawayWinners giveawayWinners, GiveawayCompleted giveawayCompleted, WebAppData webAppData, InlineKeyboardMarkup replyMarkup, User senderBusinessBot, String businessConnectionId, Boolean isFromOffline, String effectId, Boolean showCaptionAboveMedia, pro.kaleert.nyagram.api.objects.media.PaidMediaInfo paidMedia, pro.kaleert.nyagram.api.objects.payments.RefundedPayment refundedPayment, Boolean isDirectMessage, Boolean isSuggested, ManagedBotCreated managedBotCreated, PollOptionAdded pollOptionAdded, PollOptionDeleted pollOptionDeleted, String replyToPollOptionId, LivePhoto livePhoto, User guestBotCallerUser, Chat guestBotCallerChat, String guestQueryId, GiftInfo gift, Integer paidStarCount, pro.kaleert.nyagram.api.objects.system.SystemMessages.PaidMessagePriceChanged paidMessagePriceChanged) {
+        this(null, null, null, messageId, messageThreadId, from, senderChat, date, chat, forwardOrigin, forwardDate, isTopicMessage, isAutomaticForward, replyToMessage, externalReplyInfo, textQuote, viaBot, editDate, hasProtectedContent, mediaGroupId, authorSignature, text, entities, linkPreviewOptions, animation, audio, document, photo, sticker, story, video, videoNote, voice, caption, captionEntities, hasMediaSpoiler, contact, dice, game, poll, venue, location, newChatMembers, leftChatMember, newChatTitle, newChatPhoto, deleteChatPhoto, groupChatCreated, supergroupChatCreated, channelChatCreated, messageAutoDeleteTimerChanged, migrateToChatId, migrateFromChatId, pinnedMessage, invoice, successfulPayment, usersShared, chatShared, connectedWebsite, writeAccessAllowed, passportData, proximityAlertTriggered, boostAdded, forumTopicCreated, forumTopicEdited, forumTopicClosed, forumTopicReopened, generalForumTopicHidden, generalForumTopicUnhidden, videoChatScheduled, videoChatStarted, videoChatEnded, videoChatParticipantsInvited, giveawayCreated, giveaway, giveawayWinners, giveawayCompleted, webAppData, replyMarkup, senderBusinessBot, businessConnectionId, isFromOffline, effectId, showCaptionAboveMedia, paidMedia, refundedPayment, isDirectMessage, isSuggested, managedBotCreated, pollOptionAdded, pollOptionDeleted, replyToPollOptionId, livePhoto, guestBotCallerUser, guestBotCallerChat, guestQueryId, gift, paidStarCount, paidMessagePriceChanged);
+    }
 }

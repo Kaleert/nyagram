@@ -18,11 +18,15 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class SavePreparedKeyboardButton extends BotApiMethod<PreparedKeyboardButton> {
+    
+    /** Имя метода Telegram Bot API: {@code savePreparedKeyboardButton}. */
     public static final String PATH = "savePreparedKeyboardButton";
 
+    /** Уникальный идентификатор пользователя Telegram. */
     @JsonProperty("user_id")
     private Long userId;
 
+    /** Описание кнопки клавиатуры, сохраняемой для последующего использования. */
     @JsonProperty("button")
     private KeyboardButton button;
 

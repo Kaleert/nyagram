@@ -132,8 +132,22 @@ public record User(
      */
     public Boolean getHasMainWebApp() { return hasMainWebApp; }
 
+    /**
+     * Возвращает, включены ли темы у пользователя, если Telegram предоставил этот признак.
+     * @return Флаг поддержки тем или {@code null}, если значение не передано.
+     */
     public Boolean getHasTopicsEnabled() { return hasTopicsEnabled; }
+
+    /**
+     * Возвращает, разрешено ли пользователям создавать темы в соответствующем контексте.
+     * @return Флаг разрешения или {@code null}, если значение не передано.
+     */
     public Boolean getAllowsUsersToCreateTopics() { return allowsUsersToCreateTopics; }
+    
+    /**
+     * Возвращает, разрешено ли пользователю управлять ботами, если Telegram предоставил этот признак.
+     * @return Флаг разрешения или {@code null}, если значение не передано.
+     */
     public Boolean getCanManageBots() { return canManageBots; }
     
     /**
@@ -198,6 +212,11 @@ public record User(
         return Boolean.TRUE.equals(isPremium);
     }
 
+    /**
+     * Экранирует специальные HTML-символы в тексте для безопасного включения в HTML-разметку.
+     * @param text Исходный текст для экранирования.
+     * @return Текст с экранированными HTML-символами; для {@code null} — пустая строка.
+     */
     private String escapeHtml(String text) {
         if (text == null) return "";
         return text.replace("&", "&amp;")

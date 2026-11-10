@@ -40,11 +40,7 @@ public class LocaleService {
     private static final String NOT_FOUND_TEMPLATE = "[MISSING_TRANSLATION: %s]";
     
     /**
-     * Получает сырую строку перевода по ключу.
-     *
-     * @param locale Локаль, для которой нужен перевод.
-     * @param key Ключ сообщения (например, "menu.title").
-     * @return Найденная строка или шаблон ошибки, если ключ не найден ни в одной локали.
+     * Инициализирует локаль по умолчанию и загружает YAML-файлы переводов после создания Spring Bean.
      */
     @PostConstruct
     public void init() {

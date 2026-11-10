@@ -64,9 +64,11 @@ public class SendMessage extends BotApiMethod<Message> {
     @JsonProperty("parse_mode")
     private String parseMode;
 
+    /** Сущности форматирования текста (смещения в единицах UTF-16). */
     @JsonProperty("entities")
     private List<MessageEntity> entities;
 
+    /** Настройки предварительного просмотра ссылок. */
     @JsonProperty("link_preview_options")
     private LinkPreviewOptions linkPreviewOptions;
     
@@ -92,6 +94,7 @@ public class SendMessage extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку текста без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -147,7 +150,11 @@ public class SendMessage extends BotApiMethod<Message> {
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) {
+        // BOTAPI104_EPHEMERAL_CHAT: callback-only ephemeral replies need no chat_id.
+        boolean ephemeralCallback = ephemeralMessageParameters != null &&
+                ephemeralMessageParameters.callbackQueryId() != null &&
+                !ephemeralMessageParameters.callbackQueryId().isBlank();
+        if ((chatId == null || chatId.isBlank()) && !ephemeralCallback) {
             throw new TelegramApiValidationException("ChatId cannot be empty", PATH, "chat_id");
         }
         if (text == null || text.isEmpty()) {

@@ -34,6 +34,7 @@ public class NyagramProperties implements NyagramBotConfig {
     private String workerThreadPrefix = "nyagram-worker-";
     private long workerKeepAliveTimeMs = 60_000L;
     
+    /** Список типов обновлений Telegram, которые должен принимать бот. */
     private List<String> allowedUpdates;
     
     private String apiUrl = "https://api.telegram.org";

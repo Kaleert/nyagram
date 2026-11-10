@@ -25,8 +25,11 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetChatAdministrators extends BotApiMethod<List<ChatMember>> {
+    
+    /** Имя метода Telegram Bot API: {@code getChatAdministrators}. */
     public static final String PATH = "getChatAdministrators";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 

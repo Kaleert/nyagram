@@ -26,44 +26,58 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SendVenue extends BotApiMethod<Message> {
 
+    /** Имя метода Telegram Bot API: {@code sendVenue}. */
     public static final String PATH = "sendVenue";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор топика в супергруппе-форуме. */
     @JsonProperty("message_thread_id")
     private Integer messageThreadId;
 
+    /** Широта в градусах. */
     @JsonProperty("latitude")
     private Double latitude;
 
+    /** Долгота в градусах. */
     @JsonProperty("longitude")
     private Double longitude;
 
+    /** Название места или заведения. */
     @JsonProperty("title")
     private String title;
 
+    /** Почтовый адрес места или заведения. */
     @JsonProperty("address")
     private String address;
 
+    /** Идентификатор места в Foursquare. */
     @JsonProperty("foursquare_id")
     private String foursquareId;
 
+    /** Тип места по классификации Foursquare. */
     @JsonProperty("foursquare_type")
     private String foursquareType;
 
+    /** Идентификатор места в Google Places. */
     @JsonProperty("google_place_id")
     private String googlePlaceId;
 
+    /** Тип места по классификации Google Places. */
     @JsonProperty("google_place_type")
     private String googlePlaceType;
 
+    /** Отправить сообщение без звукового уведомления. */
     @JsonProperty("disable_notification")
     private Boolean disableNotification;
 
+    /** Запретить пересылку и сохранение содержимого сообщения. */
     @JsonProperty("protect_content")
     private Boolean protectContent;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
 
@@ -76,6 +90,7 @@ public class SendVenue extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку без доступного исходного сообщения. Предпочтительнее replyParameters.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -89,9 +104,11 @@ public class SendVenue extends BotApiMethod<Message> {
     @JsonProperty("reply_parameters")
     private ReplyParameters replyParameters;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private ReplyKeyboard replyMarkup;
 
+    /** Идентификатор бизнес-подключения для отправки от его имени. */
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
     
@@ -122,7 +139,9 @@ public class SendVenue extends BotApiMethod<Message> {
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) throw new TelegramApiValidationException("ChatId is required", PATH);
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) throw new TelegramApiValidationException("ChatId is required", PATH);
         if (latitude == null) throw new TelegramApiValidationException("Latitude is required", PATH);
         if (longitude == null) throw new TelegramApiValidationException("Longitude is required", PATH);
         if (title == null || title.isEmpty()) throw new TelegramApiValidationException("Title is required", PATH);

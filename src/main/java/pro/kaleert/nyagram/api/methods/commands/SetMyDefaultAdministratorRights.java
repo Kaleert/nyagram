@@ -19,11 +19,15 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SetMyDefaultAdministratorRights extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code setMyDefaultAdministratorRights}. */
     public static final String PATH = "setMyDefaultAdministratorRights";
 
+    /** Права администратора, которые бот будет запрашивать по умолчанию. */
     @JsonProperty("rights")
     private ChatAdministratorRights rights;
 
+    /** Если true, устанавливает права по умолчанию для каналов; иначе — для групп. */
     @JsonProperty("for_channels")
     private Boolean forChannels;
 

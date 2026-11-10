@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class LogOut extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code logOut}. */
     public static final String PATH = "logOut";
 
     @Override

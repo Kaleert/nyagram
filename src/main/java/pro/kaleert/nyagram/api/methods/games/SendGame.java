@@ -70,6 +70,7 @@ public class SendGame extends BotApiMethod<Message> {
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку, если сообщение для ответа недоступно. Предпочтительнее использовать replyParameters.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -92,6 +93,7 @@ public class SendGame extends BotApiMethod<Message> {
     @JsonProperty("reply_markup")
     private InlineKeyboardMarkup replyMarkup;
 
+    /** Идентификатор визуального эффекта сообщения. */
     @JsonProperty("message_effect_id")
     private String messageEffectId;
 

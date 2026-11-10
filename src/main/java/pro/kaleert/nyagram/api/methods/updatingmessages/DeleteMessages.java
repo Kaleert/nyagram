@@ -19,11 +19,14 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class DeleteMessages extends BotApiMethodBoolean {
 
+    /** Имя метода Telegram Bot API: {@code deleteMessages}. */
     public static final String PATH = "deleteMessages";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификаторы сообщений, которые требуется удалить. */
     @JsonProperty("message_ids")
     private List<Integer> messageIds;
 

@@ -23,6 +23,8 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetBusinessConnection extends BotApiMethod<BusinessConnection> {
+    
+    /** Имя метода Telegram Bot API: {@code getBusinessConnection}. */
     public static final String PATH = "getBusinessConnection";
 
     /** Уникальный идентификатор бизнес-соединения. */

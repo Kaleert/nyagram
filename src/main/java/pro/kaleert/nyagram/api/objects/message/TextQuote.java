@@ -17,8 +17,21 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TextQuote(
+    @JsonProperty("rich_texts") java.util.List<com.fasterxml.jackson.databind.JsonNode> richTexts,
     @JsonProperty("text") String text,
     @JsonProperty("entities") List<MessageEntity> entities,
     @JsonProperty("position") Integer position,
     @JsonProperty("is_manual") Boolean isManual
-) implements BotApiObject {}
+) implements BotApiObject {    // BOTAPI104_OLD_RECORD_CONSTRUCTOR
+    @Deprecated(since = "1.2.4")
+    public TextQuote(String text, List<MessageEntity> entities, Integer position, Boolean isManual) {
+        this(null, text, entities, position, isManual);
+    }
+    /** Typed, lossless representation of Bot API RichText values. */
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    public java.util.List<pro.kaleert.nyagram.api.objects.richtext.RichTextValue> richTextsDecoded() {
+        if (richTexts == null) return java.util.List.of();
+        return richTexts.stream().map(pro.kaleert.nyagram.api.objects.richtext.RichTextValue::from).toList();
+    }
+
+}

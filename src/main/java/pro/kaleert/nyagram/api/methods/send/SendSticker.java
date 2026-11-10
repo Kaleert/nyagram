@@ -82,6 +82,7 @@ public class SendSticker extends BotApiMethod<Message> implements MultipartReque
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку без доступного исходного сообщения. Предпочтительнее replyParameters.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -109,6 +110,7 @@ public class SendSticker extends BotApiMethod<Message> implements MultipartReque
     @JsonProperty("business_connection_id")
     private String businessConnectionId;
     
+    /** Разрешить платную рассылку с использованием Telegram Stars. */
     @JsonProperty("allow_paid_broadcast")
     private Boolean allowPaidBroadcast;
     
@@ -131,7 +133,9 @@ public class SendSticker extends BotApiMethod<Message> implements MultipartReque
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) {
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) {
             throw new TelegramApiValidationException("ChatId обязателен", PATH, "chat_id");
         }
         if (sticker == null) {

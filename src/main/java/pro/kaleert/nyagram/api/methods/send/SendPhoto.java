@@ -50,6 +50,7 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор топика в супергруппе-форуме. */
     @JsonProperty("message_thread_id")
     private Integer messageThreadId;
     
@@ -72,6 +73,7 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
     @JsonProperty("parse_mode")
     private String parseMode;
 
+    /** Сущности форматирования подписи к медиафайлу. */
     @JsonProperty("caption_entities")
     private List<MessageEntity> captionEntities;
     
@@ -81,9 +83,11 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
     @JsonProperty("has_spoiler")
     private Boolean hasSpoiler;
 
+    /** Отправить сообщение без звукового уведомления. */
     @JsonProperty("disable_notification")
     private Boolean disableNotification;
 
+    /** Запретить пересылку и сохранение содержимого сообщения. */
     @JsonProperty("protect_content")
     private Boolean protectContent;
 
@@ -96,6 +100,7 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку фотографии без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -154,7 +159,9 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) {
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) {
             throw new TelegramApiValidationException("ChatId cannot be empty", PATH, "chat_id");
         }
         if (photo == null) {
@@ -273,6 +280,7 @@ public class SendPhoto extends BotApiMethod<Message> implements MultipartRequest
         this.messageEffectId = effectId;
         return this;
     }
+
     /**
      * Разрешить платную рассылку этого сообщения (0.1 Star за сообщение).
      * @return текущий билдер.

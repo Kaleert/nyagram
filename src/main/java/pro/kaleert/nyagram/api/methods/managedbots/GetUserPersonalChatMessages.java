@@ -23,10 +23,17 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetUserPersonalChatMessages extends BotApiMethod<List<Message>> {
+
+    /** Имя метода Telegram Bot API: {@code getUserPersonalChatMessages}. */
     public static final String PATH = "getUserPersonalChatMessages";
 
+    /** Идентификатор пользователя, сообщения личного чата которого запрашиваются. */
     @JsonProperty("user_id") private Long userId;
+    
+    /** Максимальное количество сообщений, возвращаемых за один запрос. */
     @JsonProperty("limit") private Integer limit;
+    
+    /** Идентификатор сообщения, используемый как смещение при постраничной загрузке. */
     @JsonProperty("offset_message_id") private Integer offsetMessageId;
 
     @Override public String getMethod() { return PATH; }

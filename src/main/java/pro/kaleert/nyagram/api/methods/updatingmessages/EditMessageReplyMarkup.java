@@ -23,17 +23,22 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EditMessageReplyMarkup extends BotApiMethod<Serializable> {
 
+    /** Имя метода Telegram Bot API: {@code editMessageReplyMarkup}. */
     public static final String PATH = "editMessageReplyMarkup";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 
+    /** Идентификатор сообщения в пределах чата. */
     @JsonProperty("message_id")
     private Integer messageId;
 
+    /** Идентификатор инлайн-сообщения, клавиатура которого изменяется. */
     @JsonProperty("inline_message_id")
     private String inlineMessageId;
 
+    /** Клавиатура или иная разметка ответа. */
     @JsonProperty("reply_markup")
     private InlineKeyboardMarkup replyMarkup;
 

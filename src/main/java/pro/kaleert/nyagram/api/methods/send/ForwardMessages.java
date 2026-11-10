@@ -20,13 +20,26 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ForwardMessages extends BotApiMethod<List<MessageId>> {
+    
+    /** Имя метода Telegram Bot API: {@code forwardMessages}. */
     public static final String PATH = "forwardMessages";
 
+    /** Идентификатор чата, в который пересылаются сообщения. */
     @JsonProperty("chat_id") private String chatId;
+    
+    /** Идентификатор темы форума в целевом чате. */
     @JsonProperty("message_thread_id") private Integer messageThreadId;
+    
+    /** Идентификатор исходного чата для пересылки. */
     @JsonProperty("from_chat_id") private String fromChatId;
+    
+    /** Список идентификаторов сообщений, подлежащих пересылке. */
     @JsonProperty("message_ids") private List<Integer> messageIds;
+    
+    /** Пересылает сообщения без звукового уведомления. */
     @JsonProperty("disable_notification") private Boolean disableNotification;
+    
+    /** Включает защиту пересланного содержимого от сохранения и дальнейшей пересылки. */
     @JsonProperty("protect_content") private Boolean protectContent;
     
     /**

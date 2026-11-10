@@ -29,6 +29,7 @@ import pro.kaleert.nyagram.api.objects.chat.Chat;
     @JsonSubTypes.Type(value = InaccessibleMessage.class, name = "0")
 })
 public sealed interface MaybeInaccessibleMessage extends BotApiObject permits Message, InaccessibleMessage {
+    
     /** Чат, которому принадлежит сообщение. */
     Chat chat();
     

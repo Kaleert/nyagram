@@ -26,8 +26,10 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CreateChatSubscriptionInviteLink extends BotApiMethod<ChatInviteLink> {
 
+    /** Имя метода Telegram Bot API: {@code createChatSubscriptionInviteLink}. */
     public static final String PATH = "createChatSubscriptionInviteLink";
 
+    /** Идентификатор целевого чата или имя публичного канала. */
     @JsonProperty("chat_id")
     private String chatId;
 

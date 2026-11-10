@@ -22,13 +22,26 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SavePreparedInlineMessage extends BotApiMethod<PreparedInlineMessage> {
+    
+    /** Имя метода Telegram Bot API: {@code savePreparedInlineMessage}. */
     public static final String PATH = "savePreparedInlineMessage";
 
+    /** Идентификатор пользователя, для которого сохраняется инлайн-сообщение. */
     @JsonProperty("user_id") private Long userId;
+    
+    /** Содержимое инлайн-результата, сохраняемое для последующей отправки. */
     @JsonProperty("result") private InlineQueryResult result;
+    
+    /** Разрешает отправлять подготовленное сообщение в личные чаты с пользователями. */
     @JsonProperty("allow_user_chats") private Boolean allowUserChats;
+    
+    /** Разрешает отправлять подготовленное сообщение в чаты с ботами. */
     @JsonProperty("allow_bot_chats") private Boolean allowBotChats;
+    
+    /** Разрешает отправлять подготовленное сообщение в группы и супергруппы. */
     @JsonProperty("allow_group_chats") private Boolean allowGroupChats;
+    
+    /** Разрешает отправлять подготовленное сообщение в каналы. */
     @JsonProperty("allow_channel_chats") private Boolean allowChannelChats;
 
     @Override public String getMethod() { return PATH; }

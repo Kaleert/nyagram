@@ -27,6 +27,7 @@ public record Location(
     @JsonProperty("proximity_alert_radius") Integer proximityAlertRadius
 ) implements BotApiObject {
 
+    /** Средний радиус Земли в километрах, используемый для расчёта расстояний. */
     private static final int EARTH_RADIUS_KM = 6371;
     
     /**

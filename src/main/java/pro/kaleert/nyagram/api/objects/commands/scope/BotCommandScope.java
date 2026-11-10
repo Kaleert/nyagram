@@ -34,32 +34,71 @@ public sealed interface BotCommandScope extends BotApiObject
             BotCommandScopeAllChatAdministrators, BotCommandScopeChat, BotCommandScopeChatAdministrators, 
             BotCommandScopeChatMember {
 
+    /**
+     * Возвращает идентификатор области видимости команд Telegram Bot API.
+     *
+     * @return строковый идентификатор типа области команд
+     */
     String getType();
 
+    /**
+     * Создаёт область команд по умолчанию.
+     *
+     * @return область команд по умолчанию
+     */
     static BotCommandScopeDefault def() {
         return new BotCommandScopeDefault();
     }
 
+    /**
+     * Создаёт область видимости команд для всех личных чатов.
+     * @return Объект области видимости всех личных чатов.
+     */
     static BotCommandScopeAllPrivateChats allPrivateChats() {
         return new BotCommandScopeAllPrivateChats();
     }
 
+    /**
+     * Создаёт область видимости команд для всех групп и супергрупп.
+     * @return Объект области видимости групповых чатов.
+     */
     static BotCommandScopeAllGroupChats allGroupChats() {
         return new BotCommandScopeAllGroupChats();
     }
 
+    /**
+     * Создаёт область видимости команд для администраторов всех групп и супергрупп.
+     * @return Объект области видимости администраторов чатов.
+     */
     static BotCommandScopeAllChatAdministrators allChatAdmins() {
         return new BotCommandScopeAllChatAdministrators();
     }
 
+    /**
+     * Создаёт область видимости команд для указанного чата.
+     * @param chatId Идентификатор целевого чата.
+     * @return Объект области видимости заданного чата.
+     */
     static BotCommandScopeChat chat(Long chatId) {
         return new BotCommandScopeChat(chatId.toString());
     }
     
+    /**
+     * Создаёт область видимости команд для администраторов указанного чата.
+     * @param chatId Идентификатор целевого чата.
+     * @return Объект области видимости администраторов заданного чата.
+     */
     static BotCommandScopeChatAdministrators chatAdmins(Long chatId) {
         return new BotCommandScopeChatAdministrators(chatId.toString());
     }
 
+    /**
+     * Создаёт область команд для определённого участника заданного чата.
+     *
+     * @param chatId числовой идентификатор целевого чата
+     * @param userId идентификатор пользователя, для которого действуют команды
+     * @return область команд конкретного участника
+     */
     static BotCommandScopeChatMember member(Long chatId, Long userId) {
         return new BotCommandScopeChatMember(chatId.toString(), userId);
     }

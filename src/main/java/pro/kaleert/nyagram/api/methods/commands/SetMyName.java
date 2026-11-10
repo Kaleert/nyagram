@@ -17,6 +17,8 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SetMyName extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code setMyName}. */
     public static final String PATH = "setMyName";
 
     /** Новое имя бота (0-64 символа). Передайте пустое, чтобы удалить. */

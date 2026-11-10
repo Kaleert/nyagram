@@ -13,8 +13,8 @@ import java.util.Set;
  * @since 1.0.0
  */
 public interface UserPermissionProvider {
-    /**
-     * Возвращает набор прав пользователя.
+    
+    /** * Возвращает набор прав пользователя.
      *
      * @param user Пользователь Telegram.
      * @return Набор строк-ключей прав (например, Set.of("admin", "editor")).

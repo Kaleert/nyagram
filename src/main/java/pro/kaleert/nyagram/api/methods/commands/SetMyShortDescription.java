@@ -17,12 +17,15 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SetMyShortDescription extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code setMyShortDescription}. */
     public static final String PATH = "setMyShortDescription";
 
     /** Краткое описание (0-120 символов). */
     @JsonProperty("short_description")
     private String shortDescription;
 
+    /** Языковой код интерфейса пользователя в формате IETF. */
     @JsonProperty("language_code")
     private String languageCode;
 

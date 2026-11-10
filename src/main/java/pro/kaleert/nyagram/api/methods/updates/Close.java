@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Close extends BotApiMethodBoolean {
+    
+    /** Имя метода Telegram Bot API: {@code close}. */
     public static final String PATH = "close";
 
     @Override

@@ -25,6 +25,7 @@ import lombok.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class VerifyChat extends BotApiMethodBoolean {
 
+    /** Имя метода Telegram Bot API: {@code verifyChat}. */
     public static final String PATH = "verifyChat";
 
     /** Уникальный идентификатор целевого чата или username канала (в формате @channelusername). */
@@ -37,6 +38,12 @@ public class VerifyChat extends BotApiMethodBoolean {
      */
     @JsonProperty("custom_description")
     private String customDescription;
+
+    /** Режим разбора разметки пользовательского описания верификации чата. */
+    @JsonProperty("custom_description_parse_mode") private String customDescriptionParseMode;
+    
+    /** Сущности форматирования пользовательского описания верификации чата. */
+    @JsonProperty("custom_description_entities") private java.util.List<pro.kaleert.nyagram.api.objects.message.MessageEntity> customDescriptionEntities;
 
     @Override
     public String getMethod() {

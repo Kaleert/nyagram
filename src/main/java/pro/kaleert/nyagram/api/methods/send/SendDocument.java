@@ -112,6 +112,7 @@ public class SendDocument extends BotApiMethod<Message> implements MultipartRequ
     private Integer replyToMessageId;
 
     /**
+     * Устаревший флаг: разрешает отправку документа без найденного сообщения для ответа.
      * @deprecated Используйте {@link #replyParameters} начиная с Nyagram 1.1.5
      */
     @Deprecated(since = "1.1.5")
@@ -170,7 +171,9 @@ public class SendDocument extends BotApiMethod<Message> implements MultipartRequ
 
     @Override
     public void validate() throws TelegramApiValidationException {
-        if (chatId == null || chatId.isEmpty()) {
+        if (((chatId == null || chatId.isEmpty()) && !(ephemeralMessageParameters != null
+                && ephemeralMessageParameters.callbackQueryId() != null
+                && !ephemeralMessageParameters.callbackQueryId().isBlank())) /* BOTAPI104_EPHEMERAL_CHAT */) {
             throw new TelegramApiValidationException("ChatId обязателен", PATH, "chat_id");
         }
         if (document == null) {

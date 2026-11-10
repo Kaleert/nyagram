@@ -9,6 +9,25 @@ import lombok.Builder;
 /**
  * Представляет права администратора в чате.
  *
+ *
+ * @param isAnonymous Разрешает администратору оставаться анонимным.
+ * @param canManageChat Разрешает управлять чатом, включая просмотр журнала событий и статистики.
+ * @param canDeleteMessages Разрешает удалять сообщения других пользователей.
+ * @param canManageVideoChats Разрешает управлять видеочатами.
+ * @param canRestrictMembers Разрешает ограничивать права и блокировать участников.
+ * @param canPromoteMembers Разрешает назначать новых администраторов.
+ * @param canChangeInfo Разрешает изменять название, фото и описание чата.
+ * @param canInviteUsers Разрешает приглашать пользователей.
+ * @param canPostStories Разрешает публиковать истории от имени чата.
+ * @param canEditStories Разрешает редактировать истории чата.
+ * @param canDeleteStories Разрешает удалять истории чата.
+ * @param canPostMessages Разрешает публиковать сообщения от имени канала.
+ * @param canEditMessages Разрешает редактировать сообщения в канале.
+ * @param canPinMessages Разрешает закреплять сообщения.
+ * @param canManageTopics Разрешает создавать, изменять и удалять темы форума.
+ * @param canManageDirectMessages Разрешает управлять личными сообщениями канала.
+ * @param canManageTags Разрешает управлять тегами участников.
+ * @param canSendWelcomeMessages Разрешает отправлять приветственные сообщения.
  * @since 1.1.4
  */
 @Builder(toBuilder = true)

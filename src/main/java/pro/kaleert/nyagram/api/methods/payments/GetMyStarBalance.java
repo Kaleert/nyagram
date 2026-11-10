@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GetMyStarBalance extends BotApiMethod<StarBalance> {
 
+    /** Имя метода Telegram Bot API: {@code getMyStarBalance}. */
     public static final String PATH = "getMyStarBalance";
 
     @Override

@@ -130,15 +130,19 @@ public class PromoteChatMember extends BotApiMethodBoolean {
     @JsonProperty("can_manage_topics")
     private Boolean canManageTopics;
 
+    /** Разрешено управлять личными сообщениями канала. */
     @JsonProperty("can_manage_direct_messages")
     private Boolean canManageDirectMessages;
     
+    /** Разрешает администратору управлять тегами участников чата. */
     @JsonProperty("can_manage_tags")
     private Boolean canManageTags;
     
     /*
      * @since 1.2.2
      */
+
+    /** Разрешает администратору отправлять приветственные сообщения, если эта возможность поддерживается чатом. */
     @JsonProperty("can_send_welcome_messages")
     private Boolean canSendWelcomeMessages;
 

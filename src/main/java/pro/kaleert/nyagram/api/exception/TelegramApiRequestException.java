@@ -15,8 +15,14 @@ import lombok.Getter;
 public class TelegramApiRequestException extends TelegramApiException {
 
     private String apiResponse;
+
+    /** Числовой код ошибки Telegram Bot API; присутствует при ошибочном ответе. */
     private Integer errorCode;
+
+    /** Текстовое описание результата или ошибки, возвращённое Telegram. */
     private String description;
+    
+    /** Дополнительные параметры ошибки Telegram (например, время ожидания). */
     private ResponseParameters parameters;
     
     /**

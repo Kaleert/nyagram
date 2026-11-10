@@ -20,14 +20,29 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class CopyMessages extends BotApiMethod<List<MessageId>> {
+    
+    /** Имя метода Telegram Bot API: {@code copyMessages}. */
     public static final String PATH = "copyMessages";
 
+    /** Идентификатор целевого чата, в который копируются сообщения. */
     @JsonProperty("chat_id") private String chatId;
+    
+    /** Идентификатор темы форума в целевом чате. */
     @JsonProperty("message_thread_id") private Integer messageThreadId;
+    
+    /** Идентификатор исходного чата, из которого копируются сообщения. */
     @JsonProperty("from_chat_id") private String fromChatId;
+    
+    /** Список идентификаторов сообщений для копирования. */
     @JsonProperty("message_ids") private List<Integer> messageIds;
+    
+    /** Отправляет скопированные сообщения без звукового уведомления. */
     @JsonProperty("disable_notification") private Boolean disableNotification;
+    
+    /** Запрещает пересылку и сохранение скопированного содержимого, если это поддерживается Telegram. */
     @JsonProperty("protect_content") private Boolean protectContent;
+    
+    /** Удаляет подписи у копируемых медиафайлов. */
     @JsonProperty("remove_caption") private Boolean removeCaption;
     
     /**
